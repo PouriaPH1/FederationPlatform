@@ -11,17 +11,26 @@ public class AdminController : Controller
     private readonly IUserService _userService;
     private readonly IActivityService _activityService;
     private readonly INewsService _newsService;
+    private readonly INotificationService _notificationService;
+    private readonly IEmailService _emailService;
+    private readonly IActivityLogService _activityLogService;
     private readonly ILogger<AdminController> _logger;
 
     public AdminController(
         IUserService userService,
         IActivityService activityService,
         INewsService newsService,
+        INotificationService notificationService,
+        IEmailService emailService,
+        IActivityLogService activityLogService,
         ILogger<AdminController> logger)
     {
         _userService = userService;
         _activityService = activityService;
         _newsService = newsService;
+        _notificationService = notificationService;
+        _emailService = emailService;
+        _activityLogService = activityLogService;
         _logger = logger;
     }
 
@@ -107,10 +116,39 @@ public class AdminController : Controller
     {
         try
         {
+            // Get activity details before approval
+            var activity = await _activityService.GetActivityByIdAsync(activityId);
+            if (activity == null)
+                return NotFound();
+
             var result = await _activityService.ApproveActivityAsync(activityId);
             
             if (!result.Succeeded)
                 return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در تایید");
+
+            // Send notification to representative
+            await _notificationService.SendActivityApprovalNotificationAsync(
+                activity.UserId, activityId, activity.Title);
+
+            // Send email to representative
+            var user = await _userService.GetUserByIdAsync(activity.UserId);
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                await _emailService.SendActivityApprovalEmailAsync(
+                    user.Email, user.Username, activity.Title);
+            }
+
+            // Log the action
+            await _activityLogService.LogAsync(new Application.DTOs.CreateActivityLogDto
+            {
+                UserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                Action = "Approve",
+                EntityType = "Activity",
+                EntityId = activityId,
+                Details = $"تایید فعالیت: {activity.Title}",
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
+                UserAgent = HttpContext.Request.Headers["User-Agent"].ToString()
+            });
 
             _logger.LogInformation("Activity {ActivityId} approved", activityId);
             return RedirectToAction("PendingActivities", new { message = "فعالیت تایید شد" });
@@ -127,10 +165,39 @@ public class AdminController : Controller
     {
         try
         {
+            // Get activity details before rejection
+            var activity = await _activityService.GetActivityByIdAsync(activityId);
+            if (activity == null)
+                return NotFound();
+
             var result = await _activityService.RejectActivityAsync(activityId, rejectionReason);
             
             if (!result.Succeeded)
                 return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در رد کردن");
+
+            // Send notification to representative
+            await _notificationService.SendActivityRejectionNotificationAsync(
+                activity.UserId, activityId, activity.Title);
+
+            // Send email to representative
+            var user = await _userService.GetUserByIdAsync(activity.UserId);
+            if (user != null && !string.IsNullOrEmpty(user.Email))
+            {
+                await _emailService.SendActivityRejectionEmailAsync(
+                    user.Email, user.Username, activity.Title, rejectionReason);
+            }
+
+            // Log the action
+            await _activityLogService.LogAsync(new Application.DTOs.CreateActivityLogDto
+            {
+                UserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                Action = "Reject",
+                EntityType = "Activity",
+                EntityId = activityId,
+                Details = $"رد فعالیت: {activity.Title} - دلیل: {rejectionReason}",
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
+                UserAgent = HttpContext.Request.Headers["User-Agent"].ToString()
+            });
 
             _logger.LogInformation("Activity {ActivityId} rejected", activityId);
             return RedirectToAction("PendingActivities", new { message = "فعالیت رد شد" });

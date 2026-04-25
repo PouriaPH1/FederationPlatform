@@ -1,0 +1,118 @@
+@model FederationPlatform.Application.DTOs.OrganizationDto
+@{
+    ViewData["Title"] = Model.Name;
+    var activities = ViewBag.Activities as List<FederationPlatform.Application.DTOs.ActivityListDto>;
+}
+
+<div class="container py-4" dir="rtl">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index", "Home")">خانه</a></li>
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index")">تشکل‌ها</a></li>
+                    <li class="breadcrumb-item active">@Model.Name</li>
+                </ol>
+            </nav>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        @if (!string.IsNullOrEmpty(Model.LogoUrl))
+                        {
+                            <img src="@Model.LogoUrl" alt="@Model.Name" class="mb-3" style="max-height: 150px;">
+                        }
+                        <h1 class="card-title">@Model.Name</h1>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="organization-description">
+                            <h5 class="mb-3">درباره تشکل</h5>
+                            @Html.Raw(Model.Description.Replace("\n", "<br>"))
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Activities Section -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list"></i>
+                        فعالیت‌های مرتبط با این تشکل
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (activities == null || !activities.Any())
+                    {
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i>
+                            فعالیتی برای این تشکل ثبت نشده است
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>عنوان</th>
+                                        <th>دانشگاه</th>
+                                        <th>تاریخ شروع</th>
+                                        <th>وضعیت</th>
+                                        <th>عملیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var activity in activities)
+                                    {
+                                        <tr>
+                                            <td>@activity.Title</td>
+                                            <td>@activity.UniversityName</td>
+                                            <td>@activity.StartDate.ToString("yyyy/MM/dd")</td>
+                                            <td>
+                                                @if (activity.Status == "Approved")
+                                                {
+                                                    <span class="badge bg-success">تایید شده</span>
+                                                }
+                                                else if (activity.Status == "Pending")
+                                                {
+                                                    <span class="badge bg-warning">در انتظار</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-danger">رد شده</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <a href="@Url.Action("Details", "Activity", new { id = activity.Id })" class="btn btn-sm btn-primary">
+                                                    مشاهده
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <a href="@Url.Action("Index")" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    بازگشت به لیست تشکل‌ها
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .organization-description {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        text-align: justify;
+    }
+</style>

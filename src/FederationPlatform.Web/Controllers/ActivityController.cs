@@ -13,17 +13,26 @@ public class ActivityController : Controller
     private readonly IActivityService _activityService;
     private readonly IUniversityService _universityService;
     private readonly IFileService _fileService;
+    private readonly INotificationService _notificationService;
+    private readonly IEmailService _emailService;
+    private readonly IUserService _userService;
     private readonly ILogger<ActivityController> _logger;
 
     public ActivityController(
         IActivityService activityService,
         IUniversityService universityService,
         IFileService fileService,
+        INotificationService notificationService,
+        IEmailService emailService,
+        IUserService userService,
         ILogger<ActivityController> logger)
     {
         _activityService = activityService;
         _universityService = universityService;
         _fileService = fileService;
+        _notificationService = notificationService;
+        _emailService = emailService;
+        _userService = userService;
         _logger = logger;
     }
 
@@ -169,6 +178,25 @@ public class ActivityController : Controller
                         if (!uploadResult.Succeeded)
                             _logger.LogWarning("Failed to upload file: {FileName}", file.FileName);
                     }
+                }
+            }
+
+            // Send notifications to all admins
+            var activity = await _activityService.GetActivityByIdAsync(activityId);
+            if (activity != null)
+            {
+                var currentUser = await _userService.GetUserByIdAsync(int.Parse(userId));
+                var representativeName = currentUser?.Username ?? "نماینده";
+
+                await _notificationService.SendNewActivityNotificationToAdminAsync(
+                    activityId, activity.Title, representativeName);
+
+                // Send email to admins
+                var admins = await _userService.GetAdminUsersAsync();
+                foreach (var admin in admins)
+                {
+                    await _emailService.SendNewActivityNotificationEmailAsync(
+                        admin.Email, admin.Username, activity.Title, representativeName);
                 }
             }
 

@@ -1,0 +1,124 @@
+@model List<FederationPlatform.Application.DTOs.WorkshopDto>
+@{
+    ViewData["Title"] = "کارگاه‌ها و سمینارها";
+}
+
+<div class="container-fluid py-4" dir="rtl">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3">🎓 کارگاه‌ها و سمینارها</h2>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i>
+            کارگاهی برای نمایش وجود ندارد
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var workshop in Model)
+            {
+                var isUpcoming = workshop.StartDate > DateTime.Now;
+                var isPast = workshop.EndDate < DateTime.Now;
+                var statusClass = isUpcoming ? "success" : (isPast ? "secondary" : "primary");
+                var statusText = isUpcoming ? "آینده" : (isPast ? "گذشته" : "در حال برگزاری");
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm hover-lift">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title mb-0">@workshop.Title</h5>
+                                <span class="badge bg-@statusClass">@statusText</span>
+                            </div>
+                            
+                            <p class="card-text text-muted">
+                                @if (workshop.Description.Length > 120)
+                                {
+                                    @workshop.Description.Substring(0, 120)...
+                                }
+                                else
+                                {
+                                    @workshop.Description
+                                }
+                            </p>
+
+                            <div class="mb-2">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar"></i>
+                                    @workshop.StartDate.ToString("yyyy/MM/dd") - @workshop.EndDate.ToString("yyyy/MM/dd")
+                                </small>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(workshop.Location))
+                            {
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        @workshop.Location
+                                    </small>
+                                </div>
+                            }
+
+                            @if (workshop.MaxParticipants > 0)
+                            {
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <i class="fas fa-users"></i>
+                                        ظرفیت: @workshop.MaxParticipants نفر
+                                    </small>
+                                </div>
+                            }
+
+                            <a href="@Url.Action("Details", new { id = workshop.Id })" class="btn btn-sm btn-primary w-100">
+                                مشاهده جزئیات
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (ViewBag.TotalPages > 1)
+        {
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    @if (ViewBag.CurrentPage > 1)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })">قبلی</a>
+                        </li>
+                    }
+
+                    @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                        </li>
+                    }
+
+                    @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+                    {
+                        <li class="page-item">
+                            <a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })">بعدی</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        }
+    }
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+</style>

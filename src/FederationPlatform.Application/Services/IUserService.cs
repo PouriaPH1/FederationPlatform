@@ -12,4 +12,5 @@ public interface IUserService
     Task<bool> PromoteToRepresentativeAsync(int id);
     Task<bool> DeleteUserAsync(int id);
     Task<int> GetTotalCountAsync();
+    Task<IEnumerable<UserDto>> GetAdminUsersAsync();
 }
