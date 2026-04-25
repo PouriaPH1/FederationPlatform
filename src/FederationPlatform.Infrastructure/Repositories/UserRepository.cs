@@ -1,6 +1,7 @@
 using FederationPlatform.Application.Interfaces;
 using FederationPlatform.Domain.Entities;
 using FederationPlatform.Domain.Enums;
+using FederationPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FederationPlatform.Infrastructure.Repositories;
@@ -24,6 +25,11 @@ public class UserRepository : RepositoryBase<User>, IUserRepository
     public async Task<IEnumerable<User>> GetByRoleAsync(UserRole role)
     {
         return await _dbSet.Where(u => u.Role == role).ToListAsync();
+    }
+
+    public async Task<IEnumerable<User>> GetAdminsAsync()
+    {
+        return await _dbSet.Where(u => u.Role == UserRole.Admin).ToListAsync();
     }
 
     public async Task<bool> UsernameExistsAsync(string username)

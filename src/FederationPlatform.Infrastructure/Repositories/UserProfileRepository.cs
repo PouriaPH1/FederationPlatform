@@ -1,5 +1,7 @@
 using FederationPlatform.Application.Interfaces;
 using FederationPlatform.Domain.Entities;
+using FederationPlatform.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace FederationPlatform.Infrastructure.Repositories;
 
@@ -12,6 +14,11 @@ public class UserProfileRepository : RepositoryBase<UserProfile>, IUserProfileRe
     public async Task<UserProfile?> GetByUserIdAsync(int userId)
     {
         return await _dbSet.FirstOrDefaultAsync(up => up.UserId == userId);
+    }
+
+    public async Task<IEnumerable<UserProfile>> GetAllAsync()
+    {
+        return await _dbSet.ToListAsync();
     }
 
     public async Task<bool> ExistsForUserAsync(int userId)

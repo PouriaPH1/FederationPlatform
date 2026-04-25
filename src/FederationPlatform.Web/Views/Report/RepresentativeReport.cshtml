@@ -1,0 +1,182 @@
+@model List<FederationPlatform.Application.DTOs.RepresentativeReportDto>
+
+@{
+    ViewBag.Title = "گزارش نمایندگان";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-user-tie me-2"></i>
+                        گزارش نمایندگان
+                    </h3>
+                </div>
+
+                <div class="card-body">
+                    <!-- Export Button -->
+                    <div class="mb-3">
+                        <form method="post" action="@Url.Action("ExportRepresentativesExcel", "Report")" style="display: inline;">
+                            <button type="submit" class="btn btn-info">
+                                <i class="fas fa-download me-2"></i>
+                                دانلود Excel
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Overall Statistics -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="stat-card-info">
+                                <h5>تعداد نمایندگان</h5>
+                                <p class="stat-value">@Model.Count</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card-info">
+                                <h5>کل فعالیت‌ها</h5>
+                                <p class="stat-value">@Model.Sum(r => r.TotalActivities)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card-info">
+                                <h5>میانگین نرخ تایید</h5>
+                                <p class="stat-value">@(Model.Count > 0 ? Math.Round(Model.Average(r => r.ApprovalRate), 1) : 0)%</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Representatives Cards -->
+                    <div class="row">
+                        @if (Model.Count == 0)
+                        {
+                            <div class="col-12">
+                                <div class="alert alert-info text-center">
+                                    <i class="fas fa-inbox me-2"></i>
+                                    اطلاعاتی یافت نشد
+                                </div>
+                            </div>
+                        }
+                        @foreach (var rep in Model.OrderByDescending(r => r.TotalActivities))
+                        {
+                            <div class="col-lg-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">@rep.RepresentativeName</h5>
+                                        <small class="text-muted">@rep.UniversityName</small>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row text-center mb-3">
+                                            <div class="col-md-3">
+                                                <h6>کل فعالیت‌ها</h6>
+                                                <p class="h5">@rep.TotalActivities</p>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h6>تایید شده</h6>
+                                                <p class="h5 text-success">@rep.ApprovedActivities</p>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h6>درانتظار</h6>
+                                                <p class="h5 text-warning">@rep.PendingActivities</p>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <h6>نرخ تایید</h6>
+                                                <p class="h5 text-primary">@Math.Round(rep.ApprovalRate, 1)%</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Progress Bar -->
+                                        <div class="progress" style="height: 25px;">
+                                            @{
+                                                int rate = (int)rep.ApprovalRate;
+                                            }
+                                            <div class="progress-bar bg-success" role="progressbar" style="width: @rate%" aria-valuenow="@rate" aria-valuemin="0" aria-valuemax="100">
+                                                @rate%
+                                            </div>
+                                        </div>
+
+                                        <!-- Activities List -->
+                                        @if (rep.Activities.Count > 0)
+                                        {
+                                            <div class="mt-3">
+                                                <h6>آخرین فعالیت‌ها</h6>
+                                                <div style="max-height: 300px; overflow-y: auto;">
+                                                    <ul class="list-group list-group-sm">
+                                                        @foreach (var activity in rep.Activities.OrderByDescending(a => a.CreatedAt).Take(5))
+                                                        {
+                                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                                <span>@activity.Title</span>
+                                                                <span class="badge @(activity.Status == "Approved" ? "bg-success" : activity.Status == "Pending" ? "bg-warning" : "bg-danger")">@activity.Status</span>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.stat-card-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stat-card-info h5 {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+.list-group-sm .list-group-item {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem;
+}
+
+.card-header h5 {
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+</style>

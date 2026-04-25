@@ -21,6 +21,11 @@ public static class DependencyInjection
         services.AddScoped<INewsService, NewsService>();
         services.AddScoped<IWorkshopService, WorkshopService>();
         services.AddScoped<IDashboardService, DashboardService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<IReportingService, ReportingService>();
+        services.AddScoped<IFeedbackService, FeedbackService>();
+        services.AddScoped<IActivityLogService, ActivityLogService>();
+        services.AddScoped<IEmailService, Infrastructure.Services.EmailService>();
 
         return services;
     }

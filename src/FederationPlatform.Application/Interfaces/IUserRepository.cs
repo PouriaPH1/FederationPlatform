@@ -10,6 +10,7 @@ public interface IUserRepository
     Task<User?> GetByEmailAsync(string email);
     Task<IEnumerable<User>> GetAllAsync();
     Task<IEnumerable<User>> GetByRoleAsync(UserRole role);
+    Task<IEnumerable<User>> GetAdminsAsync();
     Task<User> AddAsync(User user);
     Task UpdateAsync(User user);
     Task DeleteAsync(int id);

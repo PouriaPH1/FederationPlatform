@@ -1,6 +1,7 @@
 using FederationPlatform.Application.Interfaces;
 using FederationPlatform.Domain.Entities;
 using FederationPlatform.Domain.Enums;
+using FederationPlatform.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace FederationPlatform.Infrastructure.Repositories;

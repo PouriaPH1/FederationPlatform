@@ -6,6 +6,7 @@ public interface IUserProfileRepository
 {
     Task<UserProfile?> GetByUserIdAsync(int userId);
     Task<UserProfile?> GetByIdAsync(int id);
+    Task<IEnumerable<UserProfile>> GetAllAsync();
     Task<UserProfile> AddAsync(UserProfile profile);
     Task UpdateAsync(UserProfile profile);
     Task<bool> ExistsForUserAsync(int userId);

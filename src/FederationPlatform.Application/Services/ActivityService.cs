@@ -12,12 +12,18 @@ public class ActivityService : IActivityService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IFileService _fileService;
+    private readonly INotificationService _notificationService;
 
-    public ActivityService(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService)
+    public ActivityService(
+        IUnitOfWork unitOfWork, 
+        IMapper mapper, 
+        IFileService fileService,
+        INotificationService notificationService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _fileService = fileService;
+        _notificationService = notificationService;
     }
 
     public async Task<ActivityDto?> GetActivityByIdAsync(int id)
@@ -86,6 +92,17 @@ public class ActivityService : IActivityService
         await _unitOfWork.Activities.AddAsync(activity);
         await _unitOfWork.SaveChangesAsync();
 
+        // Send notification to admins
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+        if (user?.UserProfile != null)
+        {
+            var representativeName = $"{user.UserProfile.FirstName} {user.UserProfile.LastName}".Trim();
+            await _notificationService.SendNewActivityNotificationToAdminAsync(
+                activity.Id, 
+                activity.Title, 
+                representativeName);
+        }
+
         return _mapper.Map<ActivityDto>(activity);
     }
 
@@ -120,6 +137,13 @@ public class ActivityService : IActivityService
         activity.Status = ActivityStatus.Approved;
         await _unitOfWork.Activities.UpdateAsync(activity);
         await _unitOfWork.SaveChangesAsync();
+
+        // Send approval notification to representative
+        await _notificationService.SendActivityApprovalNotificationAsync(
+            activity.UserId, 
+            activity.Id, 
+            activity.Title);
+
         return true;
     }
 
@@ -131,6 +155,13 @@ public class ActivityService : IActivityService
         activity.Status = ActivityStatus.Rejected;
         await _unitOfWork.Activities.UpdateAsync(activity);
         await _unitOfWork.SaveChangesAsync();
+
+        // Send rejection notification to representative
+        await _notificationService.SendActivityRejectionNotificationAsync(
+            activity.UserId, 
+            activity.Id, 
+            activity.Title);
+
         return true;
     }
 

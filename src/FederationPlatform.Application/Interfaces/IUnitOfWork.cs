@@ -10,6 +10,9 @@ public interface IUnitOfWork : IDisposable
     IActivityFileRepository ActivityFiles { get; }
     INewsRepository News { get; }
     IWorkshopRepository Workshops { get; }
+    INotificationRepository Notifications { get; }
+    IFeedbackRepository Feedbacks { get; }
+    IActivityLogRepository ActivityLogs { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync();

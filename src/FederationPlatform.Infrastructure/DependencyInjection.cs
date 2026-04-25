@@ -3,6 +3,7 @@ using FederationPlatform.Infrastructure.Data;
 using FederationPlatform.Infrastructure.Identity;
 using FederationPlatform.Infrastructure.Repositories;
 using FederationPlatform.Infrastructure.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -59,7 +59,7 @@ public class FileService : IFileService
         }
     }
 
-    public async Task<(bool Success, string ErrorMessage?)> DeleteFileAsync(string filePath)
+    public async Task<(bool Success, string? ErrorMessage)> DeleteFileAsync(string filePath)
     {
         try
         {

@@ -18,6 +18,9 @@ public class ApplicationDbContext : DbContext
     public DbSet<ActivityFile> ActivityFiles { get; set; }
     public DbSet<News> News { get; set; }
     public DbSet<Workshop> Workshops { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<Feedback> Feedbacks { get; set; }
+    public DbSet<ActivityLog> ActivityLogs { get; set; }
     #endregion
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -232,6 +235,32 @@ public class ApplicationDbContext : DbContext
             .WithMany(u => u.CreatedWorkshops)
             .HasForeignKey(w => w.CreatedBy)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Feedback Configuration
+        modelBuilder.Entity<Feedback>()
+            .HasKey(f => f.Id);
+
+        modelBuilder.Entity<Feedback>()
+            .HasOne(f => f.Activity)
+            .WithMany()
+            .HasForeignKey(f => f.ActivityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Feedback>()
+            .HasOne(f => f.User)
+            .WithMany()
+            .HasForeignKey(f => f.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // ActivityLog Configuration
+        modelBuilder.Entity<ActivityLog>()
+            .HasKey(al => al.Id);
+
+        modelBuilder.Entity<ActivityLog>()
+            .HasOne(al => al.User)
+            .WithMany()
+            .HasForeignKey(al => al.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         ApplySeedData(modelBuilder);
     }
