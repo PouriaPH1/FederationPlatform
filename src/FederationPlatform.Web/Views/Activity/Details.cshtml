@@ -1,0 +1,319 @@
+@model ActivityDetailViewModel
+
+@{
+    ViewBag.Title = $"جزئیات فعالیت: {Model.Title}";
+}
+
+<div class="page-header">
+    <div class="header-content">
+        <h1>@Model.Title</h1>
+        <span class="status-badge @Model.Status.ToLower()">@Model.Status</span>
+    </div>
+</div>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Activity Info -->
+            <div class="info-card">
+                <h3>اطلاعات فعالیت</h3>
+                
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-university me-2"></i>دانشگاه:</span>
+                        <span class="value">@Model.UniversityName</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-user me-2"></i>نماینده:</span>
+                        <span class="value">@Model.RepresentativeName</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-calendar me-2"></i>شروع:</span>
+                        <span class="value">@Model.StartDate?.ToString("yyyy/MM/dd HH:mm")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-hourglass-end me-2"></i>پایان:</span>
+                        <span class="value">@Model.EndDate?.ToString("yyyy/MM/dd HH:mm")</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-map-marker-alt me-2"></i>مکان:</span>
+                        <span class="value">@Model.Location</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label"><i class="fas fa-users me-2"></i>شرکت کنندگان:</span>
+                        <span class="value">@Model.ParticipantsCount</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="info-card mt-4">
+                <h3>توضیحات</h3>
+                <p class="description-text">@Html.Raw(Model.Description)</p>
+            </div>
+
+            <!-- Files -->
+            @if (Model.Files?.Any() ?? false)
+            {
+                <div class="info-card mt-4">
+                    <h3>فایل‌های پیوست</h3>
+                    <div class="files-list">
+                        @foreach (var file in Model.Files)
+                        {
+                            <a href="@file.Url" class="file-item">
+                                <i class="fas fa-file me-2"></i>
+                                <span>@file.FileName</span>
+                                <i class="fas fa-download ms-auto"></i>
+                            </a>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="action-card">
+                <h3>عملیات</h3>
+                <div class="actions-list">
+                    <button class="action-item">
+                        <i class="fas fa-share me-2"></i>
+                        <span>اشتراک‌گذاری</span>
+                    </button>
+                    <a href="@Url.Action("Index", "Activity")" class="action-item">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        <span>بازگشت</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status Timeline -->
+            <div class="timeline-card mt-4">
+                <h3>وضعیت</h3>
+                <div class="timeline">
+                    <div class="timeline-item @(Model.IsApproved ? "completed" : "pending")">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h5>@(Model.IsApproved ? "تایید شده" : "در انتظار تایید")</h5>
+                            <p class="text-muted small">توسط مدیر سیستم</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-content h1 {
+    margin: 0;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.status-badge.approved {
+    background: rgba(16, 185, 129, 0.2);
+    color: white;
+}
+
+.status-badge.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: white;
+}
+
+.info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.info-card h3 {
+    color: #1E40AF;
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #F9FAFB;
+    border-radius: 8px;
+}
+
+.info-row .label {
+    font-weight: 600;
+    color: #374151;
+}
+
+.info-row .value {
+    color: #1E40AF;
+    font-weight: 500;
+}
+
+.description-text {
+    color: #4B5563;
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.files-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #F3F4F6;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #1E40AF;
+    transition: all 0.2s;
+}
+
+.file-item:hover {
+    background: #E5E7EB;
+    color: #0EA5E9;
+}
+
+.action-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.action-card h3 {
+    color: #1E40AF;
+    margin-bottom: 1.5rem;
+}
+
+.actions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(30, 64, 175, 0.4);
+}
+
+.timeline-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-card h3 {
+    color: #1E40AF;
+    margin-bottom: 1.5rem;
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    right: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #E5E7EB;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+    padding-right: 3rem;
+}
+
+.timeline-marker {
+    position: absolute;
+    right: -8px;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    background: #E5E7EB;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px #E5E7EB;
+}
+
+.timeline-item.completed .timeline-marker {
+    background: #10B981;
+    box-shadow: 0 0 0 3px #D1FAE5;
+}
+
+.timeline-item.pending .timeline-marker {
+    background: #F59E0B;
+    box-shadow: 0 0 0 3px #FEF3C7;
+}
+
+.timeline-content h5 {
+    margin: 0;
+    color: #1E40AF;
+}
+
+.timeline-content p {
+    margin: 0.5rem 0 0;
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

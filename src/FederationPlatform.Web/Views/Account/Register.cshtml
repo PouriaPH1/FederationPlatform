@@ -1,0 +1,210 @@
+@model RegisterViewModel
+
+@{
+    ViewBag.Title = "ثبت‌نام";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت‌نام | پلتفرم فدراسیون</title>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 25px 50px rgba(30, 64, 175, 0.15);
+            overflow: hidden;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .register-header i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .register-header h2 {
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .register-body {
+            padding: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #1E40AF;
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+        }
+
+        .form-control.is-invalid {
+            border-color: #EF4444;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #EF4444;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 1.5rem;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
+            color: white;
+        }
+
+        .register-footer {
+            padding: 1.5rem 2.5rem;
+            background: #F9FAFB;
+            text-align: center;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .register-footer p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #6B7280;
+        }
+
+        .register-footer a {
+            color: #1E40AF;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .alert {
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <i class="fas fa-user-plus"></i>
+                <h2>ثبت‌نام</h2>
+            </div>
+
+            <div class="register-body">
+                @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @Model.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form method="post" asp-action="Register" novalidate>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" asp-for="Username"></label>
+                                <input type="text" class="form-control" asp-for="Username" required>
+                                <span class="invalid-feedback" asp-validation-for="Username"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" asp-for="Email"></label>
+                                <input type="email" class="form-control" asp-for="Email" required>
+                                <span class="invalid-feedback" asp-validation-for="Email"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" asp-for="Password"></label>
+                                <input type="password" class="form-control" asp-for="Password" required>
+                                <span class="invalid-feedback" asp-validation-for="Password"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label" asp-for="ConfirmPassword"></label>
+                                <input type="password" class="form-control" asp-for="ConfirmPassword" required>
+                                <span class="invalid-feedback" asp-validation-for="ConfirmPassword"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-register">
+                        <i class="fas fa-user-plus me-2"></i>ثبت‌نام
+                    </button>
+                </form>
+            </div>
+
+            <div class="register-footer">
+                <p>قبلاً ثبت‌نام کرده‌اید؟ <a asp-action="Login">وارد شوید</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

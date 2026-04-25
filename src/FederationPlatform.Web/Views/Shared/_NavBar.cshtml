@@ -1,0 +1,72 @@
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand me-3" href="@Url.Action("Index", "Home")">
+            <i class="fas fa-graduation-cap me-2"></i>
+            <span class="d-none d-md-inline">پلتفرم فدراسیون</span>
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Dashboard", "Dashboard")">
+                            <i class="fas fa-tachometer-alt me-1"></i> داشبورد
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "Activity")">
+                            <i class="fas fa-tasks me-1"></i> فعالیت‌ها
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Index", "University")">
+                            <i class="fas fa-university me-1"></i> دانشگاه‌ها
+                        </a>
+                    </li>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "Admin")">
+                                <i class="fas fa-cog me-1"></i> مدیریت
+                            </a>
+                        </li>
+                    }
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-1"></i>
+                            <span id="userDisplayName">کاربر</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="@Url.Action("Profile", "Account")">پروفایل</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="@Url.Action("Logout", "Account")">
+                                    <button type="submit" class="dropdown-item">خروج</button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Login", "Account")">
+                            <i class="fas fa-sign-in-alt me-1"></i> ورود
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="@Url.Action("Register", "Account")">
+                            <i class="fas fa-user-plus me-1"></i> ثبت‌نام
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

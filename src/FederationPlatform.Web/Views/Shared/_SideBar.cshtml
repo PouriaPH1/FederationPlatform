@@ -1,0 +1,238 @@
+<!-- Sidebar Navigation -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <button class="btn-sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h5 class="mb-0 d-none d-md-block">فدراسیون سلامت</h5>
+    </div>
+    
+    <nav class="sidebar-nav">
+        <a href="@Url.Action("Index", "Home")" class="nav-link">
+            <i class="fas fa-home"></i>
+            <span class="nav-text">صفحه اصلی</span>
+        </a>
+        
+        <a href="@Url.Action("Dashboard", "Dashboard")" class="nav-link">
+            <i class="fas fa-tachometer-alt"></i>
+            <span class="nav-text">داشبورد</span>
+        </a>
+        
+        <a href="@Url.Action("Profile", "Account")" class="nav-link">
+            <i class="fas fa-user"></i>
+            <span class="nav-text">پروفایل</span>
+        </a>
+        
+        <a href="@Url.Action("Index", "Activity")" class="nav-link">
+            <i class="fas fa-tasks"></i>
+            <span class="nav-text">فعالیت‌ها</span>
+        </a>
+        
+        <a href="@Url.Action("Index", "University")" class="nav-link">
+            <i class="fas fa-university"></i>
+            <span class="nav-text">دانشگاه‌ها</span>
+        </a>
+        
+        @if (User.IsInRole("Representative"))
+        {
+            <a href="@Url.Action("Create", "Activity")" class="nav-link">
+                <i class="fas fa-plus-circle"></i>
+                <span class="nav-text">فعالیت جدید</span>
+            </a>
+        }
+        
+        @if (User.IsInRole("Admin"))
+        {
+            <hr class="my-2 opacity-25">
+            <a href="@Url.Action("Index", "Admin")" class="nav-link">
+                <i class="fas fa-cog"></i>
+                <span class="nav-text">مدیریت</span>
+            </a>
+            <a href="@Url.Action("Users", "Admin")" class="nav-link">
+                <i class="fas fa-users"></i>
+                <span class="nav-text">کاربران</span>
+            </a>
+            <a href="@Url.Action("PendingActivities", "Admin")" class="nav-link">
+                <i class="fas fa-hourglass-half"></i>
+                <span class="nav-text">فعالیت‌های در انتظار</span>
+            </a>
+            <a href="@Url.Action("Statistics", "Admin")" class="nav-link">
+                <i class="fas fa-chart-bar"></i>
+                <span class="nav-text">آمار</span>
+            </a>
+        }
+        
+        <hr class="my-2 opacity-25">
+        <a href="@Url.Action("Logout", "Account")" class="nav-link text-danger">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="nav-text">خروج</span>
+        </a>
+    </nav>
+    
+    <div class="sidebar-user">
+        <div class="user-avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-info d-none d-md-block">
+            <div class="user-name" id="sidebarUserName">کاربر</div>
+            <div class="user-role" id="sidebarUserRole">-</div>
+        </div>
+    </div>
+</aside>
+
+<style>
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #1E40AF 0%, #1a3c6d 100%);
+    color: white;
+    padding: 1rem 0;
+    position: fixed;
+    top: 56px;
+    right: 0;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    transition: all 0.3s;
+    z-index: 900;
+}
+
+.sidebar-header {
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.btn-sidebar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.8);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s;
+    border-right: 3px solid transparent;
+}
+
+.nav-link:hover, .nav-link.active {
+    background: rgba(255,255,255,0.1);
+    color: white;
+    border-right-color: #0EA5E9;
+}
+
+.nav-text {
+    display: inline;
+}
+
+.sidebar-user {
+    position: absolute;
+    bottom: 1rem;
+    left: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: calc(100% - 3rem);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.user-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-role {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+.main-content {
+    margin-right: 250px;
+    padding-top: 56px;
+    transition: margin-right 0.3s;
+}
+
+.content-wrapper {
+    padding: 2rem;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 60px;
+        padding: 0.5rem 0;
+    }
+    
+    .sidebar-header {
+        padding: 0.75rem;
+        justify-content: center;
+    }
+    
+    .btn-sidebar-toggle {
+        display: block;
+    }
+    
+    .sidebar-header h5 {
+        display: none;
+    }
+    
+    .nav-link {
+        padding: 0.75rem;
+        justify-content: center;
+    }
+    
+    .nav-text {
+        display: none;
+    }
+    
+    .sidebar-user {
+        display: none;
+    }
+    
+    .main-content {
+        margin-right: 60px;
+    }
+    
+    .sidebar.expanded {
+        width: 250px;
+    }
+    
+    .sidebar.expanded .nav-text {
+        display: inline;
+    }
+    
+    .sidebar.expanded .sidebar-user {
+        display: flex;
+    }
+}
+</style>

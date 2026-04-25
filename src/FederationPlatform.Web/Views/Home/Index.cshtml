@@ -1,0 +1,383 @@
+@model HomeViewModel
+
+@{
+    ViewBag.Title = "صفحه اصلی";
+}
+
+<div class="home-hero">
+    <div class="hero-content">
+        <h1 class="hero-title">پلتفرم فدراسیون اقتصاد سلامت</h1>
+        <p class="hero-subtitle">مدیریت یکپارچه فعالیت‌های کمیته دانشجویی دانشگاه‌ها</p>
+        @if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            <a href="@Url.Action("Register", "Account")" class="btn btn-lg btn-primary">
+                <i class="fas fa-user-plus me-2"></i>شروع کنید
+            </a>
+        }
+    </div>
+    <div class="hero-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+</div>
+
+<div class="container-fluid py-5">
+    <div class="container">
+        <!-- Stats Section -->
+        <div class="row mb-5">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>@Model.UniversitiesCount</h4>
+                        <p>دانشگاه</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>@Model.ActivitiesCount</h4>
+                        <p>فعالیت</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>@Model.UsersCount</h4>
+                        <p>کاربر فعال</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 mb-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h4>@Model.NewsCount</h4>
+                        <p>خبر</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Universities -->
+        <div class="mb-5">
+            <h2 class="section-title">دانشگاه‌های برجسته</h2>
+            <div class="row">
+                @foreach (var university in Model.Universities.Take(6))
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="university-card">
+                            <div class="university-header">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <h5>@university.Name</h5>
+                            <p class="text-muted small">@university.City</p>
+                            <a href="@Url.Action("Details", "University", new { id = university.Id })" class="btn btn-sm btn-outline-primary">
+                                مشاهده جزئیات
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="text-center mt-4">
+                <a href="@Url.Action("Index", "University")" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>مشاهده تمام دانشگاه‌ها
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent News -->
+        <div class="mb-5">
+            <h2 class="section-title">آخرین اخبار</h2>
+            <div class="row">
+                @foreach (var news in Model.News.Take(3))
+                {
+                    <div class="col-md-6 mb-4">
+                        <div class="news-card">
+                            <div class="news-header">
+                                <h5>@news.Title</h5>
+                                <span class="date-badge">@news.PublishDate?.ToString("yyyy/MM/dd")</span>
+                            </div>
+                            <p>@Html.Raw(news.Content.Length > 150 ? news.Content.Substring(0, 150) + "..." : news.Content)</p>
+                            <a href="#" class="btn btn-sm btn-text">ادامه مطلب</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Featured Activities -->
+        @if (Model.RecentActivities.Any())
+        {
+            <div class="mb-5">
+                <h2 class="section-title">فعالیت‌های اخیر</h2>
+                <div class="row">
+                    @foreach (var activity in Model.RecentActivities.Take(3))
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="activity-card">
+                                <div class="activity-status">
+                                    <span class="status-badge @activity.Status.ToLower()">@activity.Status</span>
+                                </div>
+                                <h5>@activity.Title</h5>
+                                <p class="small text-muted">
+                                    <i class="fas fa-calendar me-1"></i>@activity.StartDate?.ToString("yyyy/MM/dd")
+                                </p>
+                                <p>@Html.Raw(activity.Description.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)</p>
+                                <a href="@Url.Action("Details", "Activity", new { id = activity.Id })" class="btn btn-sm btn-primary">
+                                    مشاهده جزئیات
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+.home-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, #f0f7ff 0%, #e0f2fe 100%);
+    text-align: center;
+}
+
+.hero-orbs {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.6;
+    filter: blur(40px);
+}
+
+.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    top: -100px;
+    right: -100px;
+}
+
+.orb-2 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, #7C3AED 0%, #1E40AF 100%);
+    bottom: -50px;
+    left: 50px;
+}
+
+.orb-3 {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, #06B6D4 0%, #0EA5E9 100%);
+    top: 50%;
+    left: 20%;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #1E40AF;
+    margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    color: #6B7280;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.1);
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(30, 64, 175, 0.2);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.stat-content h4 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1E40AF;
+    margin: 0;
+}
+
+.stat-content p {
+    color: #6B7280;
+    margin: 0;
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1E40AF;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.university-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.university-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
+}
+
+.university-header {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 auto 1rem;
+}
+
+.news-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.news-card:hover {
+    box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
+}
+
+.news-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.news-header h5 {
+    margin: 0;
+    flex: 1;
+}
+
+.date-badge {
+    background: #F3F4F6;
+    color: #6B7280;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.activity-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+    position: relative;
+}
+
+.activity-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
+}
+
+.activity-status {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+}
+
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.status-badge.approved {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.status-badge.pending {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.status-badge.rejected {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.btn-text {
+    background: none;
+    border: none;
+    color: #1E40AF;
+    padding: 0;
+    font-weight: 600;
+}
+
+.btn-text:hover {
+    color: #0EA5E9;
+}
+</style>

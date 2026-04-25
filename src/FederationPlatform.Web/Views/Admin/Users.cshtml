@@ -1,0 +1,187 @@
+@model DashboardViewModel
+
+@{
+    ViewBag.Title = "مدیریت کاربران";
+}
+
+<div class="admin-page">
+    <div class="page-header">
+        <h1>مدیریت کاربران</h1>
+        <p>مشاهده و مدیریت تمام کاربران سیستم</p>
+    </div>
+
+    <div class="container-fluid py-4">
+        <!-- Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <form method="get" class="filter-form">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="searchTerm" placeholder="جستجو در نام یا ایمیل" value="">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <select class="form-select" onchange="window.location = '@Url.Action("Users", "Admin")?role=' + this.value">
+                    <option value="">فیلتر بر اساس نقش</option>
+                    <option value="User">کاربر عادی</option>
+                    <option value="Representative">نماینده</option>
+                    <option value="Admin">مدیر</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        @if (Model.AdminDashboard?.AllUsers.Any() ?? false)
+        {
+            <div class="table-responsive">
+                <table class="table admin-table">
+                    <thead>
+                        <tr>
+                            <th>نام</th>
+                            <th>ایمیل</th>
+                            <th>دانشگاه</th>
+                            <th>نقش</th>
+                            <th>تاریخ ثبت</th>
+                            <th>عملیات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model.AdminDashboard.AllUsers)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@user.FullName</strong>
+                                </td>
+                                <td>@user.Email</td>
+                                <td>@user.UniversityName</td>
+                                <td>
+                                    <span class="role-badge @user.Role.ToLower()">@user.Role</span>
+                                </td>
+                                <td>@user.RegisterDate?.ToString("yyyy/MM/dd")</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#userModal@user.Id">
+                                            جزئیات
+                                        </button>
+                                        <form method="post" asp-action="DeleteUser" style="display:inline;">
+                                            <input type="hidden" name="userId" value="@user.Id">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('آیا مطمئن هستید؟')">
+                                                حذف
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center py-5">
+                <i class="fas fa-users" style="font-size: 3rem;"></i>
+                <p class="mt-3">کاربری یافت نشد</p>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+.admin-page {
+    padding: 2rem;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.page-header p {
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+}
+
+.filter-form .input-group {
+    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.1);
+}
+
+.admin-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.admin-table thead {
+    background: #F3F4F6;
+    border: none;
+}
+
+.admin-table th {
+    color: #1E40AF;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+}
+
+.admin-table tbody tr {
+    border-bottom: 1px solid #E5E7EB;
+    transition: background-color 0.2s;
+}
+
+.admin-table tbody tr:hover {
+    background: #F9FAFB;
+}
+
+.admin-table td {
+    border: none;
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.role-badge.user {
+    background: #DBEAFE;
+    color: #1E3A8A;
+}
+
+.role-badge.representative {
+    background: #FCD34D;
+    color: #78350F;
+}
+
+.role-badge.admin {
+    background: #FEE2E2;
+    color: #991B1B;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+</style>

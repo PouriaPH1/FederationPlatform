@@ -1,0 +1,286 @@
+@model DashboardViewModel
+
+@{
+    ViewBag.Title = "تایید فعالیت‌ها";
+}
+
+<div class="admin-page">
+    <div class="page-header">
+        <h1>تایید فعالیت‌ها</h1>
+        <p>مشاهده و تایید فعالیت‌های انتظار</p>
+    </div>
+
+    <div class="container-fluid py-4">
+        @if (Model.AdminDashboard?.PendingActivities.Any() ?? false)
+        {
+            <div class="pending-list">
+                @foreach (var activity in Model.AdminDashboard.PendingActivities)
+                {
+                    <div class="pending-card">
+                        <div class="card-header">
+                            <h4>@activity.Title</h4>
+                            <span class="submission-date">@activity.SubmitDate?.ToString("yyyy/MM/dd HH:mm")</span>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="info-item">
+                                        <strong><i class="fas fa-university me-2"></i>دانشگاه:</strong>
+                                        @activity.UniversityName
+                                    </p>
+                                    <p class="info-item">
+                                        <strong><i class="fas fa-user me-2"></i>نماینده:</strong>
+                                        @activity.RepresentativeName
+                                    </p>
+                                    <p class="info-item">
+                                        <strong><i class="fas fa-calendar me-2"></i>تاریخ:</strong>
+                                        @activity.StartDate?.ToString("yyyy/MM/dd HH:mm")
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="info-item">
+                                        <strong><i class="fas fa-map-marker-alt me-2"></i>مکان:</strong>
+                                        @activity.Location
+                                    </p>
+                                    <p class="info-item">
+                                        <strong><i class="fas fa-users me-2"></i>شرکت کنندگان:</strong>
+                                        @activity.ExpectedParticipants
+                                    </p>
+                                    <p class="info-item">
+                                        <strong><i class="fas fa-tag me-2"></i>دسته:</strong>
+                                        @activity.Category
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="description-section">
+                                <strong>توضیحات:</strong>
+                                <p>@Html.Raw(activity.Description)</p>
+                            </div>
+
+                            <div class="files-section">
+                                @if (activity.Files?.Any() ?? false)
+                                {
+                                    <strong>فایل‌های پیوست:</strong>
+                                    <ul class="file-list">
+                                        @foreach (var file in activity.Files)
+                                        {
+                                            <li>
+                                                <i class="fas fa-file me-2"></i>
+                                                <a href="@file.Url" target="_blank">@file.Name</a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="card-actions">
+                            <form method="post" asp-action="ApproveActivity" style="display:inline;">
+                                <input type="hidden" name="activityId" value="@activity.Id">
+                                <button type="submit" class="btn btn-lg btn-success">
+                                    <i class="fas fa-check me-2"></i>تایید فعالیت
+                                </button>
+                            </form>
+                            <button class="btn btn-lg btn-outline-danger" data-bs-toggle="modal" data-bs-target="#rejectModal@activity.Id">
+                                <i class="fas fa-times me-2"></i>رد کردن
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Reject Modal -->
+                    <div class="modal fade" id="rejectModal@activity.Id" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">رد کردن فعالیت</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="post" asp-action="RejectActivity">
+                                    <div class="modal-body">
+                                        <input type="hidden" name="activityId" value="@activity.Id">
+                                        <div class="mb-3">
+                                            <label class="form-label">دلیل رد کردن:</label>
+                                            <textarea class="form-control" name="rejectionReason" rows="4" required></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">لغو</button>
+                                        <button type="submit" class="btn btn-danger">رد کردن</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-success text-center py-5">
+                <i class="fas fa-check-circle" style="font-size: 3rem;"></i>
+                <p class="mt-3">تمام فعالیت‌ها تایید شده‌اند!</p>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+.admin-page {
+    padding: 2rem;
+}
+
+.page-header {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.pending-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #FEF3C7;
+}
+
+.card-header {
+    background: #F9FAFB;
+    padding: 1.5rem;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h4 {
+    margin: 0;
+    color: #1E40AF;
+}
+
+.submission-date {
+    background: #FEF3C7;
+    color: #92400E;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+.info-item {
+    margin: 0.75rem 0;
+}
+
+.info-item strong {
+    color: #374151;
+}
+
+.description-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+.description-section strong {
+    display: block;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.description-section p {
+    color: #4B5563;
+    line-height: 1.6;
+}
+
+.files-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #E5E7EB;
+}
+
+.files-section strong {
+    display: block;
+    color: #374151;
+    margin-bottom: 0.75rem;
+}
+
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-list li {
+    padding: 0.5rem 0;
+    color: #1E40AF;
+}
+
+.file-list a {
+    text-decoration: none;
+    color: #1E40AF;
+    font-weight: 500;
+}
+
+.file-list a:hover {
+    text-decoration: underline;
+}
+
+.card-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: #F9FAFB;
+    border-top: 1px solid #E5E7EB;
+}
+
+.card-actions form {
+    flex: 1;
+}
+
+.card-actions .btn {
+    width: 100%;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 12px;
+}
+
+.modal-header {
+    background: #F3F4F6;
+    border: none;
+}
+
+.modal-title {
+    color: #1E40AF;
+    font-weight: 600;
+}
+
+.form-control {
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+}
+
+.form-control:focus {
+    border-color: #1E40AF;
+    box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+}
+</style>

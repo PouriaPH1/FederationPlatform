@@ -1,0 +1,424 @@
+@model DashboardViewModel
+
+@{
+    ViewBag.Title = "داشبورد مدیریت";
+}
+
+<div class="admin-dashboard">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <h2>پنل مدیریت سیستم</h2>
+        <p>مدیریت کاربران، فعالیت‌ها و محتوا</p>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div class="metric-icon users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h4>@Model.AdminDashboard?.TotalUsers ?? 0</h4>
+                <p>کاربران ثبت شده</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div class="metric-icon activities">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h4>@Model.AdminDashboard?.TotalActivities ?? 0</h4>
+                <p>فعالیت‌های کل</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div class="metric-icon pending">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <h4>@Model.AdminDashboard?.PendingActivitiesCount ?? 0</h4>
+                <p>در انتظار تایید</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div class="metric-icon universities">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h4>@Model.AdminDashboard?.TotalUniversities ?? 0</h4>
+                <p>دانشگاه‌های عضو</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Actions -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="admin-actions">
+                <h3>عملیات مدیریتی</h3>
+                <div class="actions-grid">
+                    <a href="@Url.Action("Users", "Admin")" class="action-btn">
+                        <i class="fas fa-users"></i>
+                        <span>مدیریت کاربران</span>
+                    </a>
+                    <a href="@Url.Action("PendingActivities", "Admin")" class="action-btn">
+                        <i class="fas fa-check-square"></i>
+                        <span>تایید فعالیت‌ها</span>
+                    </a>
+                    <a href="@Url.Action("Statistics", "Admin")" class="action-btn">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>آمار سیستم</span>
+                    </a>
+                    <a href="@Url.Action("ManageNews", "Admin")" class="action-btn">
+                        <i class="fas fa-newspaper"></i>
+                        <span>مدیریت اخبار</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Activities Section -->
+    @if (Model.AdminDashboard?.PendingActivities.Any() ?? false)
+    {
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <h3 class="section-title">فعالیت‌های در انتظار تایید</h3>
+                <div class="pending-activities">
+                    @foreach (var activity in Model.AdminDashboard.PendingActivities.Take(5))
+                    {
+                        <div class="activity-item-admin">
+                            <div class="activity-header-admin">
+                                <h5>@activity.Title</h5>
+                                <span class="date">@activity.SubmitDate?.ToString("yyyy/MM/dd")</span>
+                            </div>
+                            <p class="text-muted small">
+                                <i class="fas fa-university me-2"></i>@activity.UniversityName
+                                <i class="fas fa-user mx-3 me-2"></i>@activity.RepresentativeName
+                            </p>
+                            <p class="activity-description">@Html.Raw(activity.Description.Length > 150 ? activity.Description.Substring(0, 150) + "..." : activity.Description)</p>
+                            <div class="activity-actions">
+                                <a href="@Url.Action("ApproveActivity", "Admin", new { id = activity.Id })" class="btn btn-sm btn-success">
+                                    <i class="fas fa-check me-1"></i>تایید
+                                </a>
+                                <a href="@Url.Action("RejectActivity", "Admin", new { id = activity.Id })" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-times me-1"></i>رد کردن
+                                </a>
+                            </div>
+                        </div>
+                    }
+                </div>
+                @if ((Model.AdminDashboard?.PendingActivitiesCount ?? 0) > 5)
+                {
+                    <a href="@Url.Action("PendingActivities", "Admin")" class="btn btn-primary mt-3">
+                        <i class="fas fa-eye me-2"></i>مشاهده همه
+                    </a>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Statistics Section -->
+    @if (Model.AdminDashboard?.Statistics.Any() ?? false)
+    {
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <h3 class="section-title">آمار فعالیت‌ها</h3>
+                <div class="statistics-grid">
+                    @foreach (var stat in Model.AdminDashboard.Statistics.Take(6))
+                    {
+                        <div class="stat-box-admin">
+                            <h6>@stat.Category</h6>
+                            <h4>@stat.Count</h4>
+                            <div class="stat-chart">
+                                <div class="chart-bar" style="width: @((stat.Count * 100 / (Model.AdminDashboard.Statistics.Max(s => s.Count) == 0 ? 1 : Model.AdminDashboard.Statistics.Max(s => s.Count))))%"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Recent Users -->
+    @if (Model.AdminDashboard?.RecentUsers.Any() ?? false)
+    {
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <h3 class="section-title">کاربران جدید</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>نام</th>
+                                <th>ایمیل</th>
+                                <th>دانشگاه</th>
+                                <th>تاریخ ثبت</th>
+                                <th>عملیات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.AdminDashboard.RecentUsers.Take(5))
+                            {
+                                <tr>
+                                    <td>@user.FullName</td>
+                                    <td>@user.Email</td>
+                                    <td>@user.UniversityName</td>
+                                    <td>@user.RegisterDate?.ToString("yyyy/MM/dd")</td>
+                                    <td>
+                                        <a href="@Url.Action("UserDetails", "Admin", new { id = user.Id })" class="btn btn-sm btn-outline-primary">
+                                            جزئیات
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+.admin-dashboard {
+    padding: 2rem;
+}
+
+.welcome-section {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.welcome-section h2 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.welcome-section p {
+    margin: 0.5rem 0 0;
+    opacity: 0.9;
+}
+
+.metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.metric-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 auto 1rem;
+}
+
+.metric-icon.users {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+}
+
+.metric-icon.activities {
+    background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 100%);
+}
+
+.metric-icon.pending {
+    background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+}
+
+.metric-icon.universities {
+    background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+}
+
+.metric-card h4 {
+    font-size: 2rem;
+    color: #1E40AF;
+    margin: 0;
+}
+
+.metric-card p {
+    color: #6B7280;
+    margin: 0.5rem 0 0;
+}
+
+.admin-actions {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.admin-actions h3 {
+    color: #1E40AF;
+    margin-bottom: 1.5rem;
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: #F3F4F6;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1E40AF;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.action-btn i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.action-btn span {
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.section-title {
+    color: #1E40AF;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.pending-activities {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item-admin {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-right: 4px solid #FEF3C7;
+}
+
+.activity-header-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.activity-header-admin h5 {
+    margin: 0;
+    color: #1E40AF;
+}
+
+.date {
+    background: #F3F4F6;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: #6B7280;
+}
+
+.activity-description {
+    margin: 0.75rem 0;
+    color: #4B5563;
+}
+
+.activity-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+}
+
+.stat-box-admin {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-box-admin h6 {
+    color: #6B7280;
+    margin: 0 0 0.5rem;
+    font-size: 0.85rem;
+}
+
+.stat-box-admin h4 {
+    color: #1E40AF;
+    font-size: 2rem;
+    margin: 0 0 1rem;
+}
+
+.chart-bar {
+    height: 4px;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    border-radius: 2px;
+    transition: width 0.3s;
+}
+
+.table {
+    margin: 0;
+}
+
+.table thead {
+    background: #F3F4F6;
+    border: none;
+}
+
+.table th {
+    color: #1E40AF;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+}
+
+.table td {
+    border: none;
+    padding: 1rem;
+}
+
+.table tbody tr:hover {
+    background: #F9FAFB;
+}
+
+@media (max-width: 768px) {
+    .actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .statistics-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

@@ -1,0 +1,92 @@
+using FederationPlatform.Application.Interfaces;
+using FederationPlatform.Web.Models;
+using Microsoft.AspNetCore.Mvc;
+
+namespace FederationPlatform.Web.Controllers;
+
+public class HomeController : Controller
+{
+    private readonly IActivityService _activityService;
+    private readonly IUniversityService _universityService;
+    private readonly INewsService _newsService;
+    private readonly IUserService _userService;
+    private readonly ILogger<HomeController> _logger;
+
+    public HomeController(
+        IActivityService activityService,
+        IUniversityService universityService,
+        INewsService newsService,
+        IUserService userService,
+        ILogger<HomeController> logger)
+    {
+        _activityService = activityService;
+        _universityService = universityService;
+        _newsService = newsService;
+        _userService = userService;
+        _logger = logger;
+    }
+
+    public async Task<IActionResult> Index()
+    {
+        try
+        {
+            var universities = await _universityService.GetAllUniversitiesAsync();
+            var activities = await _activityService.GetApprovedActivitiesAsync(pageNumber: 1, pageSize: 10);
+            var news = await _newsService.GetRecentNewsAsync(pageNumber: 1, pageSize: 5);
+            var userCount = await _userService.GetTotalUsersCountAsync();
+
+            var model = new HomeViewModel
+            {
+                UniversitiesCount = universities?.Count() ?? 0,
+                ActivitiesCount = activities?.Items?.Count() ?? 0,
+                UsersCount = userCount,
+                NewsCount = news?.Items?.Count() ?? 0,
+                Universities = universities?.Take(6).Select(u => new UniversityBriefViewModel
+                {
+                    Id = u.Id,
+                    Name = u.Name,
+                    City = u.City,
+                    ActivityCount = 0
+                }).ToList() ?? new List<UniversityBriefViewModel>(),
+                News = news?.Items?.Select(n => new NewsItemViewModel
+                {
+                    Id = n.Id,
+                    Title = n.Title,
+                    Content = n.Content,
+                    PublishDate = n.PublishDate
+                }).ToList() ?? new List<NewsItemViewModel>(),
+                RecentActivities = activities?.Items?.Select(a => new ActivityBriefViewModel
+                {
+                    Id = a.Id,
+                    Title = a.Title,
+                    Description = a.Description,
+                    StartDate = a.StartDate,
+                    Status = a.IsApproved ? "تایید شده" : "در انتظار"
+                }).ToList() ?? new List<ActivityBriefViewModel>()
+            };
+
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading home page");
+            return View(new HomeViewModel());
+        }
+    }
+
+    public IActionResult About()
+    {
+        return View();
+    }
+
+    public IActionResult Contact()
+    {
+        return View();
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View();
+    }
+}

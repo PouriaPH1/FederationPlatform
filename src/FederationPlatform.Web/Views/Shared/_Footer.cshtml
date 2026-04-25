@@ -1,0 +1,44 @@
+<!-- Footer -->
+<footer class="bg-dark text-white py-4 mt-5">
+    <div class="container-fluid">
+        <div class="row mb-3">
+            <div class="col-md-4 mb-3">
+                <h5>پلتفرم فدراسیون</h5>
+                <p class="text-muted small">پلتفرم یکپارچه مدیریت فعالیت‌های کمیته دانشجویی فدراسیون اقتصاد سلامت</p>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h5>دسترسی سریع</h5>
+                <ul class="list-unstyled small">
+                    <li><a href="@Url.Action("Index", "Home")" class="text-muted text-decoration-none">صفحه اصلی</a></li>
+                    <li><a href="@Url.Action("Index", "University")" class="text-muted text-decoration-none">دانشگاه‌ها</a></li>
+                    <li><a href="@Url.Action("Index", "Activity")" class="text-muted text-decoration-none">فعالیت‌ها</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-3">
+                <h5>تماس با ما</h5>
+                <p class="text-muted small">
+                    <i class="fas fa-envelope me-2"></i>
+                    <a href="mailto:info@federation.ir" class="text-muted text-decoration-none">info@federation.ir</a>
+                </p>
+            </div>
+        </div>
+        <hr class="opacity-25">
+        <div class="text-center text-muted small">
+            <p>&copy; @DateTime.Now.Year پلتفرم فدراسیون اقتصاد سلامت. تمام حقوق محفوظ است.</p>
+        </div>
+    </div>
+</footer>
+
+<style>
+footer {
+    margin-top: auto;
+}
+
+footer a {
+    transition: color 0.2s;
+}
+
+footer a:hover {
+    color: white !important;
+}
+</style>

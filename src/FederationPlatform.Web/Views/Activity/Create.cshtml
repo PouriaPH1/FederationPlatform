@@ -1,0 +1,222 @@
+@model CreateActivityViewModel
+
+@{
+    ViewBag.Title = "ایجاد فعالیت جدید";
+}
+
+<div class="page-header">
+    <h1>ایجاد فعالیت جدید</h1>
+    <p>لطفاً اطلاعات فعالیت را پر کنید</p>
+</div>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <form method="post" asp-action="Create" enctype="multipart/form-data" novalidate>
+                <div class="form-section">
+                    <h3 class="section-title">اطلاعات پایه</h3>
+                    
+                    <div class="form-group mb-3">
+                        <label class="form-label" asp-for="Title"></label>
+                        <input type="text" class="form-control" asp-for="Title" required>
+                        <span class="form-text" asp-validation-for="Title"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label" asp-for="Description"></label>
+                        <textarea class="form-control" asp-for="Description" rows="4" required></textarea>
+                        <span class="form-text" asp-validation-for="Description"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label" asp-for="UniversityId"></label>
+                                <select class="form-select" asp-for="UniversityId" asp-items="@(new SelectList(Model.Universities, "Id", "Name"))" required>
+                                    <option value="">انتخاب دانشگاه</option>
+                                </select>
+                                <span class="form-text" asp-validation-for="UniversityId"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label" asp-for="Category"></label>
+                                <select class="form-select" asp-for="Category" required>
+                                    <option value="">انتخاب دسته</option>
+                                    <option value="Workshop">کارگاه</option>
+                                    <option value="Seminar">سمینار</option>
+                                    <option value="Conference">کنفرانس</option>
+                                    <option value="Training">آموزش</option>
+                                    <option value="Other">دیگر</option>
+                                </select>
+                                <span class="form-text" asp-validation-for="Category"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">تاریخ و زمان</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label" asp-for="StartDate"></label>
+                                <input type="datetime-local" class="form-control" asp-for="StartDate" required>
+                                <span class="form-text" asp-validation-for="StartDate"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label class="form-label" asp-for="EndDate"></label>
+                                <input type="datetime-local" class="form-control" asp-for="EndDate" required>
+                                <span class="form-text" asp-validation-for="EndDate"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">مکان و شرکت کنندگان</h3>
+                    
+                    <div class="form-group mb-3">
+                        <label class="form-label" asp-for="Location"></label>
+                        <input type="text" class="form-control" asp-for="Location" placeholder="آدرس یا نام مکان">
+                        <span class="form-text" asp-validation-for="Location"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label" asp-for="ExpectedParticipants"></label>
+                        <input type="number" class="form-control" asp-for="ExpectedParticipants" min="1" required>
+                        <span class="form-text" asp-validation-for="ExpectedParticipants"></span>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="section-title">فایل‌ها و جزئیات</h3>
+                    
+                    <div class="form-group mb-3">
+                        <label class="form-label">فایل‌های پیوستی</label>
+                        <div class="file-upload-area">
+                            <input type="file" id="files" name="Files" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png,.zip" class="form-control">
+                            <small class="text-muted d-block mt-2">حداکثر اندازه: 10MB. فرمت‌های مجاز: PDF, Word, Excel, تصاویر, ZIP</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label" asp-for="Budget"></label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" asp-for="Budget" min="0" step="0.01">
+                            <span class="input-group-text">ریال</span>
+                        </div>
+                        <span class="form-text" asp-validation-for="Budget"></span>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-lg btn-primary">
+                        <i class="fas fa-check me-2"></i>ایجاد فعالیت
+                    </button>
+                    <a href="@Url.Action("Index", "Activity")" class="btn btn-lg btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>لغو
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.form-section {
+    background: white;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+    color: #1E40AF;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: #1E40AF;
+    box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+}
+
+.form-text {
+    display: block;
+    color: #EF4444;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+.file-upload-area {
+    border: 2px dashed #E5E7EB;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.2s;
+    background: #F9FAFB;
+}
+
+.file-upload-area:hover {
+    border-color: #1E40AF;
+    background: #F0F7FF;
+}
+
+.input-group {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.input-group-text {
+    background: #F3F4F6;
+    border: 2px solid #E5E7EB;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #E5E7EB;
+}
+
+.form-actions .btn {
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+}
+</style>

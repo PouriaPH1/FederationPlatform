@@ -1,0 +1,266 @@
+@model ProfileViewModel
+
+@{
+    ViewBag.Title = "پروفایل";
+}
+
+<div class="page-header">
+    <h1>پروفایل من</h1>
+    <p>مشاهده و ویرایش اطلاعات شخصی</p>
+</div>
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="profile-info">
+                        <h2>@Model.Username</h2>
+                        <p>@Model.Email</p>
+                        <span class="role-badge">@Model.Role</span>
+                    </div>
+                </div>
+
+                <form method="post" asp-action="UpdateProfile" novalidate>
+                    <div class="form-section">
+                        <h3>اطلاعات حساب</h3>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" asp-for="FirstName"></label>
+                                    <input type="text" class="form-control" asp-for="FirstName" required>
+                                    <span class="form-text" asp-validation-for="FirstName"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" asp-for="LastName"></label>
+                                    <input type="text" class="form-control" asp-for="LastName" required>
+                                    <span class="form-text" asp-validation-for="LastName"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="form-label" asp-for="Email"></label>
+                            <input type="email" class="form-control" asp-for="Email" disabled>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" asp-for="Phone"></label>
+                                    <input type="tel" class="form-control" asp-for="Phone">
+                                    <span class="form-text" asp-validation-for="Phone"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" asp-for="UniversityId"></label>
+                                    <select class="form-select" asp-for="UniversityId" asp-items="@(new SelectList(Model.Universities, "Id", "Name"))">
+                                        <option value="">انتخاب دانشگاه</option>
+                                    </select>
+                                    <span class="form-text" asp-validation-for="UniversityId"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>اطلاعات تماس</h3>
+                        
+                        <div class="form-group mb-3">
+                            <label class="form-label" asp-for="Address"></label>
+                            <input type="text" class="form-control" asp-for="Address">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" asp-for="City"></label>
+                                    <input type="text" class="form-control" asp-for="City">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label class="form-label" asp-for="PostalCode"></label>
+                                    <input type="text" class="form-control" asp-for="PostalCode">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-lg btn-primary">
+                            <i class="fas fa-save me-2"></i>ذخیره تغیرات
+                        </button>
+                        <a href="@Url.Action("Dashboard", "Dashboard")" class="btn btn-lg btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>بازگشت
+                        </a>
+                    </div>
+                </form>
+
+                @if (@User.IsInRole("User") && !@User.IsInRole("Representative"))
+                {
+                    <div class="form-section mt-4">
+                        <h3>ترقی به نماینده</h3>
+                        <p class="text-muted">می‌خواهید نماینده دانشگاه شوید و فعالیت‌های جدید ایجاد کنید؟</p>
+                        <form method="post" asp-action="UpgradeToRepresentative">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-arrow-up me-2"></i>درخواست ترقی
+                            </button>
+                        </form>
+                    </div>
+                }
+            </div>
+
+            @if (@User.IsInRole("Representative"))
+            {
+                <div class="profile-card mt-4">
+                    <h3>آمار فعالیت‌های من</h3>
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <div class="stat-box">
+                                <h4>@Model.TotalActivities</h4>
+                                <p>فعالیت کل</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box">
+                                <h4>@Model.ApprovedActivities</h4>
+                                <p>فعالیت تایید شده</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box">
+                                <h4>@Model.PendingActivities</h4>
+                                <p>در انتظار تایید</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #E5E7EB;
+    align-items: center;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3rem;
+}
+
+.profile-info h2 {
+    margin: 0;
+    color: #1E40AF;
+}
+
+.profile-info p {
+    margin: 0.5rem 0 1rem;
+    color: #6B7280;
+}
+
+.role-badge {
+    display: inline-block;
+    background: #F3F4F6;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #1E40AF;
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h3 {
+    color: #1E40AF;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #F3F4F6;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: #1E40AF;
+    box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.form-actions .btn {
+    flex: 1;
+}
+
+.stat-box {
+    padding: 1.5rem;
+    background: #F3F4F6;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.stat-box h4 {
+    color: #1E40AF;
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+.stat-box p {
+    color: #6B7280;
+    margin: 0.5rem 0 0;
+}
+</style>

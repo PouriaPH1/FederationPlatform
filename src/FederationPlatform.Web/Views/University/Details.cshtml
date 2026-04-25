@@ -1,0 +1,343 @@
+@model UniversityDetailViewModel
+
+@{
+    ViewBag.Title = $"دانشگاه {Model.Name}";
+}
+
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-icon">
+            <i class="fas fa-university"></i>
+        </div>
+        <div class="header-info">
+            <h1>@Model.Name</h1>
+            <p>
+                <i class="fas fa-map-marker-alt me-2"></i>@Model.City
+                <i class="fas fa-phone mx-3 me-2"></i>@Model.Phone
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card-tall">
+                <div class="stat-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h4>@Model.ActivitiesCount</h4>
+                <p>فعالیت‌های برگزار شده</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card-tall">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h4>@Model.MembersCount</h4>
+                <p>نماینده فعال</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card-tall">
+                <div class="stat-icon">
+                    <i class="fas fa-newspaper"></i>
+                </div>
+                <h4>@Model.NewsCount</h4>
+                <p>خبر منتشر شده</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card-tall">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <h4>@Model.WorkshopsCount</h4>
+                <p>کارگاه برگزار شده</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    @if (!string.IsNullOrEmpty(Model.Description))
+    {
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="info-card">
+                    <h3>درباره دانشگاه</h3>
+                    <p>@Html.Raw(Model.Description)</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Recent Activities -->
+    @if (Model.RecentActivities.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <h3 class="section-title">فعالیت‌های اخیر</h3>
+            </div>
+            @foreach (var activity in Model.RecentActivities.Take(6))
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="activity-card-mini">
+                        <div class="activity-header">
+                            <h5>@activity.Title</h5>
+                            <span class="status-badge @activity.Status.ToLower()">@activity.Status</span>
+                        </div>
+                        <p class="activity-date">
+                            <i class="fas fa-calendar me-2"></i>@activity.StartDate?.ToString("yyyy/MM/dd")
+                        </p>
+                        <p class="activity-description">
+                            @Html.Raw(activity.Description.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)
+                        </p>
+                        <a href="@Url.Action("Details", "Activity", new { id = activity.Id })" class="btn btn-sm btn-primary">
+                            مشاهده جزئیات
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Representatives -->
+    @if (Model.Representatives.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <h3 class="section-title">نمایندگان</h3>
+            </div>
+            @foreach (var rep in Model.Representatives)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="representative-card">
+                        <div class="rep-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h5>@rep.FullName</h5>
+                        <p class="text-muted">@rep.Email</p>
+                        <p class="text-muted small">@rep.Phone</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- News -->
+    @if (Model.News.Any())
+    {
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <h3 class="section-title">اخبار اخیر</h3>
+            </div>
+            @foreach (var news in Model.News.Take(3))
+            {
+                <div class="col-lg-12 mb-3">
+                    <div class="news-card-horizontal">
+                        <div class="news-date">@news.PublishDate?.ToString("yyyy/MM/dd")</div>
+                        <h5>@news.Title</h5>
+                        <p>@Html.Raw(news.Content.Length > 200 ? news.Content.Substring(0, 200) + "..." : news.Content)</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-12 text-center">
+            <a href="@Url.Action("Index", "University")" class="btn btn-outline-primary">
+                <i class="fas fa-arrow-left me-2"></i>بازگشت به لیست دانشگاه‌ها
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    color: white;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+}
+
+.header-content {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.header-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+.header-info h1 {
+    margin: 0;
+}
+
+.stat-card-tall {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.stat-card-tall:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 auto 1rem;
+}
+
+.stat-card-tall h4 {
+    color: #1E40AF;
+    font-size: 2rem;
+    margin: 0;
+}
+
+.info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.info-card h3 {
+    color: #1E40AF;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    color: #1E40AF;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.activity-card-mini {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.activity-card-mini:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.15);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.activity-header h5 {
+    margin: 0;
+}
+
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.approved {
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.status-badge.pending {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.activity-date {
+    color: #6B7280;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+.activity-description {
+    color: #4B5563;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.representative-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+.representative-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(30, 64, 175, 0.15);
+}
+
+.rep-avatar {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    margin: 0 auto 1rem;
+}
+
+.representative-card h5 {
+    color: #1E40AF;
+    margin: 0;
+}
+
+.news-card-horizontal {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #1E40AF;
+}
+
+.news-date {
+    font-size: 0.85rem;
+    color: #6B7280;
+    margin-bottom: 0.5rem;
+}
+
+.news-card-horizontal h5 {
+    margin: 0 0 0.5rem;
+    color: #1E40AF;
+}
+</style>
