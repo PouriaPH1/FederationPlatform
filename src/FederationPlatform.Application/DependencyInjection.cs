@@ -25,7 +25,10 @@ public static class DependencyInjection
         services.AddScoped<IReportingService, ReportingService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
         services.AddScoped<IActivityLogService, ActivityLogService>();
-        services.AddScoped<IEmailService, Infrastructure.Services.EmailService>();
+        // EmailService is registered in Infrastructure layer
+        
+        // Add caching service
+        services.AddSingleton<ICacheService, CacheService>();
 
         return services;
     }

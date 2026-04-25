@@ -16,7 +16,6 @@ public class ApplicationUserManager : UserManager<User>
         {
             Username = username,
             Email = email,
-            EmailConfirmed = true,
             Role = UserRole.Admin,
             IsActive = true
         };
@@ -31,7 +30,6 @@ public class ApplicationUserManager : UserManager<User>
         {
             Username = username,
             Email = email,
-            EmailConfirmed = false,
             Role = UserRole.Representative,
             IsActive = true
         };

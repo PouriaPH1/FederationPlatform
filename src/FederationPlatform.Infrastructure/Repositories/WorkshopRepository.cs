@@ -17,7 +17,7 @@ public class WorkshopRepository : RepositoryBase<Workshop>, IWorkshopRepository
         return await _dbSet
             .Where(w => w.StartDate >= now)
             .OrderBy(w => w.StartDate)
-            .Include(w => w.CreatedByUser)
+            .Include(w => w.Creator)
             .ToListAsync();
     }
 
@@ -27,7 +27,7 @@ public class WorkshopRepository : RepositoryBase<Workshop>, IWorkshopRepository
         return await _dbSet
             .Where(w => w.StartDate >= now)
             .OrderBy(w => w.StartDate)
-            .Include(w => w.CreatedByUser)
+            .Include(w => w.Creator)
             .ToListAsync();
     }
 }

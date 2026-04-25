@@ -7,6 +7,7 @@ public interface INewsService
     Task<IEnumerable<NewsDto>> GetAllNewsAsync();
     Task<IEnumerable<NewsDto>> GetPublishedNewsAsync();
     Task<IEnumerable<NewsDto>> GetLatestNewsAsync(int count);
+    Task<IEnumerable<NewsDto>> GetUniversityNewsAsync(int universityId);
     Task<NewsDto?> GetNewsByIdAsync(int id);
     Task<NewsDto> CreateNewsAsync(int adminUserId, CreateNewsDto dto);
     Task<bool> UpdateNewsAsync(int id, UpdateNewsDto dto);

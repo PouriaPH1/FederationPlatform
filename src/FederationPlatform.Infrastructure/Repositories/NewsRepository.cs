@@ -16,7 +16,7 @@ public class NewsRepository : RepositoryBase<News>, INewsRepository
         return await _dbSet
             .Where(n => n.PublishedAt <= DateTime.UtcNow)
             .OrderByDescending(n => n.PublishedAt)
-            .Include(n => n.CreatedByUser)
+            .Include(n => n.Creator)
             .ToListAsync();
     }
 
@@ -25,7 +25,7 @@ public class NewsRepository : RepositoryBase<News>, INewsRepository
         return await _dbSet
             .OrderByDescending(n => n.PublishedAt)
             .Take(count)
-            .Include(n => n.CreatedByUser)
+            .Include(n => n.Creator)
             .ToListAsync();
     }
 }

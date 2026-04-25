@@ -1,0 +1,53 @@
+[
+  {
+    "outputFileName": "wwwroot/css/site.min.css",
+    "inputFiles": [
+      "wwwroot/css/site.css",
+      "wwwroot/css/rtl.css"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    }
+  },
+  {
+    "outputFileName": "wwwroot/js/site.min.js",
+    "inputFiles": [
+      "wwwroot/js/app.js",
+      "wwwroot/js/auth.js",
+      "wwwroot/js/sidebar.js",
+      "wwwroot/js/form-validation.js",
+      "wwwroot/js/file-upload.js",
+      "wwwroot/js/search-filter.js",
+      "wwwroot/js/lazyload.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/notifications.min.js",
+    "inputFiles": [
+      "wwwroot/js/notifications.js",
+      "wwwroot/js/notification-manager.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  },
+  {
+    "outputFileName": "wwwroot/js/charts.min.js",
+    "inputFiles": [
+      "wwwroot/js/charts.js"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "sourceMap": false
+  }
+]

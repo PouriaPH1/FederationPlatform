@@ -17,6 +17,8 @@ public class UserDashboardViewModel
     public List<NewsItemViewModel>? RecentNews { get; set; }
     public List<WorkshopItemViewModel>? UpcomingWorkshops { get; set; }
     public List<UniversityBriefViewModel>? Universities { get; set; }
+    public List<ActivityDetailViewModel>? MyActivities { get; set; }
+    public List<ActivityDetailViewModel>? JoinedActivities { get; set; }
     public int TotalActivities { get; set; }
     public int PendingActivities { get; set; }
 }
@@ -40,15 +42,19 @@ public class AdminDashboardViewModel
     public int TotalUsers { get; set; }
     public int TotalActivities { get; set; }
     public int PendingActivities { get; set; }
+    public int PendingActivitiesCount { get; set; }
     public int ApprovedActivities { get; set; }
     public int RejectedActivities { get; set; }
     public int TotalUniversities { get; set; }
     public int TotalOrganizations { get; set; }
     public List<PendingActivityViewModel>? PendingActivityList { get; set; }
     public List<UserAdminViewModel>? UsersList { get; set; }
+    public List<UserAdminViewModel>? RecentUsers { get; set; }
     public List<ActivityStatViewModel>? ActivityStats { get; set; }
+    public List<ActivityStatViewModel>? Statistics { get; set; }
     public Dictionary<string, int>? ActivityTypeStats { get; set; }
     public Dictionary<string, int>? UniversityActivityStats { get; set; }
+    public ManageNewsViewModel? ManageNews { get; set; }
 }
 
 public class PendingActivityViewModel
@@ -71,7 +77,10 @@ public class UserAdminViewModel
     public bool IsActive { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
+    public string? FullName => $"{FirstName} {LastName}".Trim();
+    public string? UniversityName { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime RegisterDate { get; set; }
 }
 
 public class ActivityStatViewModel

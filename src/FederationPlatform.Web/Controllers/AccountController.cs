@@ -1,6 +1,8 @@
 using FederationPlatform.Application.DTOs;
-using FederationPlatform.Application.Interfaces;
+using FederationPlatform.Application.Services;
+using FederationPlatform.Infrastructure.Identity;
 using FederationPlatform.Web.Models;
+using FederationPlatform.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;

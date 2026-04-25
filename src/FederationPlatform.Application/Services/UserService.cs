@@ -89,9 +89,27 @@ public class UserService : IUserService
         return await _unitOfWork.Users.CountAsync();
     }
 
+    public async Task<int> GetTotalUsersCountAsync()
+    {
+        return await _unitOfWork.Users.CountAsync();
+    }
+
     public async Task<IEnumerable<UserDto>> GetAdminUsersAsync()
     {
         var admins = await _unitOfWork.Users.GetByRoleAsync(UserRole.Admin);
         return _mapper.Map<IEnumerable<UserDto>>(admins);
+    }
+
+    public async Task<IEnumerable<UserDto>> GetAdminsAsync()
+    {
+        var admins = await _unitOfWork.Users.GetByRoleAsync(UserRole.Admin);
+        return _mapper.Map<IEnumerable<UserDto>>(admins);
+    }
+
+    public async Task<IEnumerable<UserDto>> GetRecentUsersAsync(int count = 10)
+    {
+        var users = await _unitOfWork.Users.GetAllAsync();
+        var recent = users.OrderByDescending(u => u.CreatedAt).Take(count);
+        return _mapper.Map<IEnumerable<UserDto>>(recent);
     }
 }

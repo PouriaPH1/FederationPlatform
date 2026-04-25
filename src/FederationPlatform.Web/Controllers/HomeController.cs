@@ -1,4 +1,4 @@
-using FederationPlatform.Application.Interfaces;
+using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 

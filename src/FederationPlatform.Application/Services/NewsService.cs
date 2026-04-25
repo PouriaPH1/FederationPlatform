@@ -87,4 +87,10 @@ public class NewsService : INewsService
         await _unitOfWork.SaveChangesAsync();
         return true;
     }
+
+    public async Task<IEnumerable<NewsDto>> GetUniversityNewsAsync(int universityId)
+    {
+        var allNews = await GetPublishedNewsAsync();
+        return allNews;
+    }
 }

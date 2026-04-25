@@ -1,5 +1,6 @@
-using FederationPlatform.Application.Interfaces;
+using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
+using FederationPlatform.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -246,14 +247,19 @@ public class AdminController : Controller
             {
                 AdminDashboard = new AdminDashboardViewModel
                 {
-                    ManageNews = news?.Select(n => new ManageNewsViewModel
+                    ManageNews = new ManageNewsViewModel
                     {
-                        Id = n.Id,
-                        Title = n.Title,
-                        Content = n.Content,
-                        PublishDate = n.PublishDate,
-                        UniversityName = n.University?.Name ?? "عمومی"
-                    }).ToList() ?? new List<ManageNewsViewModel>()
+                        NewsList = news?.Select(n => new NewsItemViewModel
+                        {
+                            Id = n.Id,
+                            Title = n.Title,
+                            Content = n.Content,
+                            ImageUrl = n.ImageUrl,
+                            PublishedAt = n.PublishedAt,
+                            CreatedByName = n.CreatedByUsername
+                        }).ToList() ?? new List<NewsItemViewModel>(),
+                        TotalCount = news?.Count ?? 0
+                    }
                 }
             };
 
@@ -271,12 +277,15 @@ public class AdminController : Controller
     {
         try
         {
-            var result = await _userService.DeleteUserAsync(userId);
-            
-            if (!result.Succeeded)
-                return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در حذف");
+            if (!int.TryParse(userId, out int id))
+                return BadRequest("شناسه کاربر معتبر نیست");
 
-            _logger.LogInformation("User {UserId} deleted", userId);
+            var result = await _userService.DeleteUserAsync(id);
+            
+            if (!result)
+                return BadRequest("خطا در حذف");
+
+            _logger.LogInformation("User {UserId} deleted", id);
             return RedirectToAction("Users", new { message = "کاربر حذف شد" });
         }
         catch (Exception ex)

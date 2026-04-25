@@ -27,14 +27,22 @@ public class ActivityListDto
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public string? Category { get; set; }
+    public string? Location { get; set; }
+    public int? ParticipantCount { get; set; }
     public ActivityType ActivityType { get; set; }
     public string ActivityTypeName { get; set; } = string.Empty;
     public string UniversityName { get; set; } = string.Empty;
+    public string? University { get; set; }
     public string OrganizationName { get; set; } = string.Empty;
+    public string? Representative { get; set; }
     public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
     public ActivityStatus Status { get; set; }
     public string StatusName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public IList<ActivityFileDto>? Files { get; set; } = new List<ActivityFileDto>();
 }
 
 public class CreateActivityDto
@@ -89,4 +97,10 @@ public class PagedResultDto<T>
     public int TotalPages => (int)Math.Ceiling((double)TotalCount / PageSize);
     public bool HasPreviousPage => Page > 1;
     public bool HasNextPage => Page < TotalPages;
+}
+
+public class ActivityStatisticDto
+{
+    public string Label { get; set; } = string.Empty;
+    public int Count { get; set; }
 }

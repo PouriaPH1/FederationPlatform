@@ -137,6 +137,19 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Activity>()
             .HasKey(a => a.Id);
         
+        // Add indexes for performance
+        modelBuilder.Entity<Activity>()
+            .HasIndex(a => a.Status);
+        
+        modelBuilder.Entity<Activity>()
+            .HasIndex(a => a.CreatedAt);
+        
+        modelBuilder.Entity<Activity>()
+            .HasIndex(a => new { a.UniversityId, a.Status });
+        
+        modelBuilder.Entity<Activity>()
+            .HasIndex(a => new { a.OrganizationId, a.Status });
+        
         modelBuilder.Entity<Activity>()
             .Property(a => a.Title)
             .IsRequired()
@@ -208,7 +221,7 @@ public class ApplicationDbContext : DbContext
             .IsRequired();
         
         modelBuilder.Entity<News>()
-            .HasOne(n => n.CreatedByUser)
+            .HasOne(n => n.Creator)
             .WithMany(u => u.CreatedNews)
             .HasForeignKey(n => n.CreatedBy)
             .OnDelete(DeleteBehavior.Restrict);
@@ -231,7 +244,7 @@ public class ApplicationDbContext : DbContext
             .HasMaxLength(200);
         
         modelBuilder.Entity<Workshop>()
-            .HasOne(w => w.CreatedByUser)
+            .HasOne(w => w.Creator)
             .WithMany(u => u.CreatedWorkshops)
             .HasForeignKey(w => w.CreatedBy)
             .OnDelete(DeleteBehavior.Restrict);
@@ -239,6 +252,10 @@ public class ApplicationDbContext : DbContext
         // Feedback Configuration
         modelBuilder.Entity<Feedback>()
             .HasKey(f => f.Id);
+
+        // Add indexes for performance
+        modelBuilder.Entity<Feedback>()
+            .HasIndex(f => new { f.ActivityId, f.IsApproved });
 
         modelBuilder.Entity<Feedback>()
             .HasOne(f => f.Activity)
@@ -255,6 +272,13 @@ public class ApplicationDbContext : DbContext
         // ActivityLog Configuration
         modelBuilder.Entity<ActivityLog>()
             .HasKey(al => al.Id);
+
+        // Add indexes for performance
+        modelBuilder.Entity<ActivityLog>()
+            .HasIndex(al => al.CreatedAt);
+        
+        modelBuilder.Entity<ActivityLog>()
+            .HasIndex(al => new { al.UserId, al.CreatedAt });
 
         modelBuilder.Entity<ActivityLog>()
             .HasOne(al => al.User)

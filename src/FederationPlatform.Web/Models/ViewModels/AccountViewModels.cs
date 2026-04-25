@@ -50,6 +50,9 @@ public class ProfileViewModel
 {
     public int UserId { get; set; }
 
+    [Display(Name = "نام کاربری")]
+    public string? Username { get; set; }
+
     [Required(ErrorMessage = "نام الزامی است")]
     [Display(Name = "نام")]
     public string FirstName { get; set; } = string.Empty;
@@ -57,6 +60,26 @@ public class ProfileViewModel
     [Required(ErrorMessage = "نام خانوادگی الزامی است")]
     [Display(Name = "نام خانوادگی")]
     public string LastName { get; set; } = string.Empty;
+
+    [EmailAddress(ErrorMessage = "ایمیل معتبر نیست")]
+    [Display(Name = "ایمیل")]
+    public string? Email { get; set; }
+
+    [Phone(ErrorMessage = "شماره تماس معتبر نیست")]
+    [Display(Name = "شماره تماس")]
+    public string? Phone { get; set; }
+
+    [Display(Name = "آدرس")]
+    public string? Address { get; set; }
+
+    [Display(Name = "شهر")]
+    public string? City { get; set; }
+
+    [Display(Name = "کد پستی")]
+    public string? PostalCode { get; set; }
+
+    [Display(Name = "نقش")]
+    public string? Role { get; set; }
 
     [Display(Name = "دانشگاه")]
     public int? UniversityId { get; set; }
@@ -86,4 +109,9 @@ public class ProfileViewModel
     public string? ProfileImageUrl { get; set; }
     public string? ResumeUrl { get; set; }
     public Dictionary<int, string>? Universities { get; set; }
+
+    // Activity Statistics
+    public int TotalActivities { get; set; }
+    public int ApprovedActivities { get; set; }
+    public int PendingActivities { get; set; }
 }

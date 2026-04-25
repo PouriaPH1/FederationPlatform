@@ -2,6 +2,7 @@ using BCrypt.Net;
 using FederationPlatform.Application.Interfaces;
 using FederationPlatform.Domain.Entities;
 using FederationPlatform.Domain.Enums;
+using BC = BCrypt.Net.BCrypt;
 
 namespace FederationPlatform.Infrastructure.Identity;
 
@@ -34,7 +35,7 @@ public class IdentityService : IIdentityService
             {
                 Username = username,
                 Email = email,
-                PasswordHash = BCrypt.HashPassword(password),
+                PasswordHash = BC.HashPassword(password),
                 Role = UserRole.User,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow
@@ -63,7 +64,7 @@ public class IdentityService : IIdentityService
             if (!user.IsActive)
                 return (false, null, "حساب کاربری شما غیر فعال است.");
 
-            if (!BCrypt.Verify(password, user.PasswordHash))
+            if (!BC.Verify(password, user.PasswordHash))
                 return (false, null, "نام کاربری یا رمز عبور نادرست است.");
 
             return (true, user, "ورود موفق بود.");
@@ -76,7 +77,7 @@ public class IdentityService : IIdentityService
 
     public async Task<bool> ValidatePasswordAsync(User user, string password)
     {
-        return await Task.FromResult(BCrypt.Verify(password, user.PasswordHash));
+        return await Task.FromResult(BC.Verify(password, user.PasswordHash));
     }
 
     public async Task<bool> PromoteToRepresentativeAsync(int userId)

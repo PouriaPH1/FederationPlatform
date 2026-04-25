@@ -202,4 +202,32 @@ public class ActivityService : IActivityService
         await _unitOfWork.SaveChangesAsync();
         return true;
     }
+
+    public async Task<int> GetTotalActivitiesCountAsync()
+    {
+        return await _unitOfWork.Activities.CountAsync();
+    }
+
+    public async Task<IEnumerable<ActivityStatisticDto>> GetActivityStatisticsAsync()
+    {
+        var activities = await _unitOfWork.Activities.GetAllAsync();
+        var stats = activities
+            .GroupBy(a => a.Status)
+            .Select(g => new ActivityStatisticDto
+            {
+                Label = g.Key.ToString(),
+                Count = g.Count()
+            });
+        return await Task.FromResult(stats);
+    }
+
+    public async Task<IEnumerable<ActivityListDto>> GetUserActivitiesAsync(int userId)
+    {
+        return await GetByUserIdAsync(userId);
+    }
+
+    public async Task<IEnumerable<ActivityListDto>> GetUniversityActivitiesAsync(int universityId)
+    {
+        return await GetByUniversityIdAsync(universityId);
+    }
 }

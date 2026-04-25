@@ -10,7 +10,10 @@ public class UserDto
     public UserRole Role { get; set; }
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? FirstName { get; set; }
+    public string? LastName { get; set; }
     public string? FullName { get; set; }
+    public int? UniversityId { get; set; }
     public string? UniversityName { get; set; }
 }
 

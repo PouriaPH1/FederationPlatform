@@ -1,5 +1,6 @@
-using FederationPlatform.Application.Interfaces;
+using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
+using FederationPlatform.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -146,7 +147,7 @@ public class ActivityController : Controller
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
-            var createDto = new CreateActivityRequest
+            var createDto = new CreateActivityDto
             {
                 Title = model.Title,
                 Description = model.Description,
@@ -156,11 +157,13 @@ public class ActivityController : Controller
                 UniversityId = model.UniversityId,
                 Category = model.Category,
                 ExpectedParticipants = model.ExpectedParticipants,
-                Budget = model.Budget ?? 0,
-                RepresentativeId = userId
+                Budget = model.Budget ?? 0
             };
 
-            var result = await _activityService.CreateActivityAsync(createDto);
+            if (!int.TryParse(userId, out var userIdInt))
+                return Unauthorized();
+
+            var result = await _activityService.CreateActivityAsync(userIdInt, createDto);
             
             if (!result.Succeeded)
                 return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در ایجاد فعالیت");
@@ -174,8 +177,8 @@ public class ActivityController : Controller
                 {
                     if (file.Length > 0)
                     {
-                        var uploadResult = await _fileService.UploadActivityFileAsync(activityId, file);
-                        if (!uploadResult.Succeeded)
+                        var uploadResult = await _fileService.UploadFileAsync(file, $"activities/{activityId}");
+                        if (string.IsNullOrEmpty(uploadResult))
                             _logger.LogWarning("Failed to upload file: {FileName}", file.FileName);
                     }
                 }
@@ -217,10 +220,10 @@ public class ActivityController : Controller
         try
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var userIdInt))
                 return Unauthorized();
 
-            var activities = await _activityService.GetUserActivitiesAsync(userId);
+            var activities = await _activityService.GetUserActivitiesAsync(userIdInt);
 
             var model = new MyActivitiesViewModel
             {

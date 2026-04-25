@@ -1,5 +1,6 @@
-using FederationPlatform.Application.Interfaces;
+using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
+using FederationPlatform.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
