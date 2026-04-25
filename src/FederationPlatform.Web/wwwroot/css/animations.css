@@ -1,0 +1,275 @@
+/* ====================================
+   Animations & Transitions
+   ==================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+/* Fade In */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.fade-in-slow {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+.fade-in-delayed {
+    animation: fadeIn 0.3s ease-in-out;
+    animation-delay: 0.1s;
+    opacity: 0;
+    animation-fill-mode: forwards;
+}
+
+/* Slide In */
+.slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+/* Bounce */
+.bounce {
+    animation: bounce 0.6s ease-in-out;
+}
+
+.bounce-hover:hover {
+    animation: bounce 0.6s ease-in-out;
+}
+
+/* Pulse */
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Spin */
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Shimmer Loading */
+.shimmer {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* ====================================
+   Transition Classes
+   ==================================== */
+
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.transition-colors {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.transition-transform {
+    transition: transform 0.3s ease;
+}
+
+.transition-opacity {
+    transition: opacity 0.3s ease;
+}
+
+/* ====================================
+   Hover Effects
+   ==================================== */
+
+.hover-lift {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.hover-glow {
+    transition: box-shadow 0.3s;
+}
+
+.hover-glow:hover {
+    box-shadow: 0 0 20px rgba(30, 64, 175, 0.4);
+}
+
+.hover-scale {
+    transition: transform 0.3s;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.hover-darken {
+    transition: background-color 0.3s;
+}
+
+.hover-darken:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* ====================================
+   Loading States
+   ==================================== */
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+    animation: shimmer 2s infinite;
+}
+
+.skeleton-text {
+    height: 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.skeleton-text:last-child {
+    margin-bottom: 0;
+}
+
+.skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+/* ====================================
+   Scale & Transform
+   ==================================== */
+
+.scale-sm {
+    transform: scale(0.95);
+}
+
+.scale-lg {
+    transform: scale(1.05);
+}
+
+/* ====================================
+   Opacity Variations
+   ==================================== */
+
+.opacity-25 {
+    opacity: 0.25;
+}
+
+.opacity-50 {
+    opacity: 0.5;
+}
+
+.opacity-75 {
+    opacity: 0.75;
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.opacity-hover-75:hover {
+    opacity: 0.75;
+}
+
+/* ====================================
+   Stagger Animation
+   ==================================== */
+
+.stagger-children > * {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.stagger-children > *:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.stagger-children > *:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+.stagger-children > *:nth-child(4) {
+    animation-delay: 0.3s;
+}
+
+.stagger-children > *:nth-child(5) {
+    animation-delay: 0.4s;
+}
+
+.stagger-children > *:nth-child(n+6) {
+    animation-delay: 0.5s;
+}

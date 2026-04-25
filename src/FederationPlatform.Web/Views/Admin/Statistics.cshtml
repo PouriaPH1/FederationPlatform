@@ -1,0 +1,350 @@
+@{
+    ViewBag.Title = "آمار و نمودارها";
+}
+
+<div class="page-header">
+    <h1><i class="fas fa-chart-bar me-2"></i>آمار و نمودارها</h1>
+    <p>بررسی تفصیلی فعالیت‌ها و آمارهای پلتفرم</p>
+</div>
+
+<div class="container-fluid py-4">
+    <!-- Summary Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #1E40AF, #0EA5E9);">
+                    <i class="fas fa-list-check"></i>
+                </div>
+                <div class="stat-content">
+                    <h5 style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">کل فعالیت‌ها</h5>
+                    <p style="font-size: 1.8rem; font-weight: 700; color: #1E40AF; margin: 0;" id="totalActivities">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #10B981, #06B6D4);">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h5 style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">تایید شده</h5>
+                    <p style="font-size: 1.8rem; font-weight: 700; color: #10B981; margin: 0;" id="approvedActivities">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #F59E0B, #F97316);">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h5 style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">در انتظار بررسی</h5>
+                    <p style="font-size: 1.8rem; font-weight: 700; color: #F59E0B; margin: 0;" id="pendingActivities">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #EF4444, #DC2626);">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h5 style="color: #666; font-size: 0.9rem; margin-bottom: 5px;">رد شده</h5>
+                    <p style="font-size: 1.8rem; font-weight: 700; color: #EF4444; margin: 0;" id="rejectedActivities">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="row mb-4">
+        <!-- Activities by University -->
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h5 class="chart-title"><i class="fas fa-university me-2"></i>فعالیت‌ها بر اساس دانشگاه</h5>
+                <canvas id="universitiesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Activity Status Distribution -->
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h5 class="chart-title"><i class="fas fa-doughnut-chart me-2"></i>توزیع وضعیت فعالیت‌ها</h5>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="row mb-4">
+        <!-- Activity Types -->
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h5 class="chart-title"><i class="fas fa-th me-2"></i>فعالیت‌ها بر اساس نوع</h5>
+                <canvas id="typesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Activities Timeline -->
+        <div class="col-lg-6">
+            <div class="chart-card">
+                <h5 class="chart-title"><i class="fas fa-line-chart me-2"></i>روند فعالیت‌ها</h5>
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="table-card">
+                <h5 class="table-title"><i class="fas fa-table me-2"></i>جزئیات فعالیت‌های اخیر</h5>
+                <div style="overflow-x: auto;">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr style="background-color: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <th style="font-weight: 600; color: #374151;">عنوان</th>
+                                <th style="font-weight: 600; color: #374151;">دانشگاه</th>
+                                <th style="font-weight: 600; color: #374151;">نماینده</th>
+                                <th style="font-weight: 600; color: #374151;">وضعیت</th>
+                                <th style="font-weight: 600; color: #374151;">تاریخ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activitiesTableBody">
+                            <!-- Data will be populated here -->
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>درحال بارگذاری...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .chart-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+        color: #1E40AF;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #E5E7EB;
+    }
+
+    .table-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .table-title {
+        color: #1E40AF;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #E5E7EB;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table tbody tr {
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f9fafb;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.35rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .status-approved {
+        background-color: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-pending {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-rejected {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    canvas {
+        max-height: 300px;
+    }
+
+    @media (max-width: 768px) {
+        .stat-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .chart-card {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sample data (in a real app, this would come from API)
+            const sampleData = {
+                universities: {
+                    labels: ['تهران', 'شریف', 'صنعتی', 'شهید بهشتی', 'البرز'],
+                    data: [45, 38, 32, 28, 25]
+                },
+                status: {
+                    labels: ['تایید شده', 'در انتظار', 'رد شده'],
+                    data: [120, 35, 15]
+                },
+                types: {
+                    labels: ['کارگاه', 'سمینار', 'کنفرانس', 'مسابقه', 'دیگر'],
+                    data: [50, 35, 30, 25, 30]
+                },
+                timeline: {
+                    labels: ['هفته 1', 'هفته 2', 'هفته 3', 'هفته 4', 'هفته 5'],
+                    datasets: [
+                        {
+                            label: 'فعالیت‌های جدید',
+                            data: [10, 15, 12, 18, 20]
+                        },
+                        {
+                            label: 'فعالیت‌های تایید شده',
+                            data: [8, 12, 10, 15, 18]
+                        }
+                    ]
+                }
+            };
+
+            // Update stat cards
+            document.getElementById('totalActivities').textContent = 
+                sampleData.status.data.reduce((a, b) => a + b, 0);
+            document.getElementById('approvedActivities').textContent = 120;
+            document.getElementById('pendingActivities').textContent = 35;
+            document.getElementById('rejectedActivities').textContent = 15;
+
+            // Create charts
+            if (window.chartsManager) {
+                chartsManager.createBarChart(
+                    'universitiesChart',
+                    sampleData.universities.labels,
+                    sampleData.universities.data,
+                    'فعالیت‌ها'
+                );
+
+                chartsManager.createDoughnutChart(
+                    'statusChart',
+                    sampleData.status.labels,
+                    sampleData.status.data,
+                    'وضعیت'
+                );
+
+                chartsManager.createPieChart(
+                    'typesChart',
+                    sampleData.types.labels,
+                    sampleData.types.data,
+                    'نوع فعالیت'
+                );
+
+                chartsManager.createLineChart(
+                    'timelineChart',
+                    sampleData.timeline.labels,
+                    sampleData.timeline.datasets,
+                    'روند'
+                );
+            }
+
+            // Populate table with sample data
+            const tableBody = document.getElementById('activitiesTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td>کارگاه برنامه‌نویسی وب</td>
+                    <td>دانشگاه تهران</td>
+                    <td>علی محمدی</td>
+                    <td><span class="status-badge status-approved">تایید شده</span></td>
+                    <td>1402/12/15</td>
+                </tr>
+                <tr>
+                    <td>سمینار هوش مصنوعی</td>
+                    <td>دانشگاه شریف</td>
+                    <td>فاطمه احمدی</td>
+                    <td><span class="status-badge status-pending">در انتظار</span></td>
+                    <td>1402/12/14</td>
+                </tr>
+                <tr>
+                    <td>مسابقه طراحی</td>
+                    <td>دانشگاه صنعتی</td>
+                    <td>محمد رضایی</td>
+                    <td><span class="status-badge status-approved">تایید شده</span></td>
+                    <td>1402/12/13</td>
+                </tr>
+            `;
+        });
+    </script>
+}

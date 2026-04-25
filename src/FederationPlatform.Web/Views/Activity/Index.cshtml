@@ -5,59 +5,317 @@
 }
 
 <div class="page-header">
-    <h1>فعالیت‌ها</h1>
-    <p>مشاهده و مدیریت فعالیت‌های فدراسیون</p>
+    <h1><i class="fas fa-tasks me-2"></i>فعالیت‌ها</h1>
+    <p>مشاهده و جستجو در فعالیت‌های فدراسیون</p>
 </div>
 
 <div class="container-fluid py-4">
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <form method="get" class="filter-form">
-                <div class="input-group">
-                    <input type="text" class="form-control" name="searchTerm" placeholder="جستجو در فعالیت‌ها" value="@Model.SearchTerm">
-                    <button class="btn btn-primary" type="submit">
+    <!-- Search & Filter Section -->
+    <div class="search-filter-section mb-4" data-searchable="true" data-search-input="[data-search]" data-table-selector="tbody">
+        <div class="row gap-3">
+            <div class="col-lg-6">
+                <div class="input-group input-group-lg">
+                    <span class="input-group-text" style="border: 1px solid #D1D5DB;">
                         <i class="fas fa-search"></i>
-                    </button>
+                    </span>
+                    <input type="text" 
+                           class="form-control" 
+                           data-search
+                           placeholder="جستجو در عنوان و توضیحات..." 
+                           style="border: 1px solid #D1D5DB; border-right: none;">
                 </div>
-            </form>
+            </div>
+            <div class="col-lg-3">
+                <select class="form-select form-select-lg" data-filter="status" style="border: 1px solid #D1D5DB;">
+                    <option value="">-- همه وضعیت‌ها --</option>
+                    <option value="Approved">تایید شده</option>
+                    <option value="Pending">در انتظار</option>
+                    <option value="Rejected">رد شده</option>
+                </select>
+            </div>
+            <div class="col-lg-3">
+                @if (User.IsInRole("Representative") || User.IsInRole("Admin"))
+                {
+                    <a href="@Url.Action("Create", "Activity")" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-plus me-2"></i>فعالیت جدید
+                    </a>
+                }
+            </div>
         </div>
-        <div class="col-md-6 text-end">
-            @if (User.IsInRole("Representative") || User.IsInRole("Admin"))
-            {
-                <a href="@Url.Action("Create", "Activity")" class="btn btn-success">
-                    <i class="fas fa-plus me-2"></i>فعالیت جدید
-                </a>
-            }
+
+        <!-- Active Filters Info -->
+        <div id="active-filters" style="margin-top: 1rem; display: none;">
+            <small class="text-muted">
+                <i class="fas fa-filter me-2"></i>
+                فیلترهای فعال:
+                <span id="filter-count">0</span>
+            </small>
         </div>
     </div>
 
-    <div class="row">
-        @if (Model.Activities.Any())
+    <!-- Activities Grid -->
+    <div class="activities-grid">
+        @if (Model.Activities != null && Model.Activities.Any())
         {
-            @foreach (var activity in Model.Activities)
-            {
-                <div class="col-md-4 mb-4">
-                    <div class="activity-card">
-                        <div class="activity-header">
-                            <h5>@activity.Title</h5>
-                            <span class="status-badge @activity.Status.ToLower()">@activity.Status</span>
+            <div class="row">
+                @foreach (var activity in Model.Activities)
+                {
+                    <div class="col-lg-4 col-md-6 mb-4 fade-in">
+                        <div class="activity-card hover-lift">
+                            <!-- Card Header -->
+                            <div class="activity-header" style="padding: 1.5rem;">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div style="flex: 1;">
+                                        <h5 style="margin: 0 0 0.5rem 0; color: #1E40AF; font-weight: 600;">
+                                            @activity.Title
+                                        </h5>
+                                        <p style="color: #666; font-size: 0.9rem; margin: 0;">
+                                            <i class="fas fa-university me-1"></i>@activity.UniversityName
+                                        </p>
+                                    </div>
+                                    <span class="badge bg-@GetStatusClass(activity.Status)" style="font-size: 0.8rem; white-space: nowrap;">
+                                        @activity.Status
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div style="padding: 0 1.5rem; border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB;">
+                                <p style="color: #666; font-size: 0.95rem; line-height: 1.5; margin: 1rem 0;">
+                                    @{
+                                        var desc = activity.Description.Length > 100 
+                                            ? activity.Description.Substring(0, 100) + "..." 
+                                            : activity.Description;
+                                    }
+                                    @Html.Raw(desc)
+                                </p>
+                            </div>
+
+                            <!-- Card Footer -->
+                            <div style="padding: 1rem 1.5rem; background-color: #F9FAFB; display: flex; gap: 1rem; flex-wrap: wrap;">
+                                @if (activity.StartDate.HasValue)
+                                {
+                                    <div style="font-size: 0.85rem; color: #666;">
+                                        <i class="fas fa-calendar-alt me-1" style="color: #1E40AF;"></i>
+                                        @activity.StartDate.Value.ToString("yy/MM/dd")
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(activity.RepresentativeName))
+                                {
+                                    <div style="font-size: 0.85rem; color: #666;">
+                                        <i class="fas fa-user me-1" style="color: #1E40AF;"></i>
+                                        @activity.RepresentativeName
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Action Button -->
+                            <div style="padding: 1rem 1.5rem;">
+                                <a href="@Url.Action("Details", "Activity", new { id = activity.Id })" 
+                                   class="btn btn-sm btn-outline-primary w-100 transition-all">
+                                    <i class="fas fa-arrow-left me-2"></i>مشاهده جزئیات
+                                </a>
+                            </div>
                         </div>
-                        
-                        <p class="activity-university">
-                            <i class="fas fa-university me-2"></i>@activity.UniversityName
-                        </p>
-                        
-                        <p class="activity-description">
-                            @Html.Raw(activity.Description.Length > 120 ? activity.Description.Substring(0, 120) + "..." : activity.Description)
-                        </p>
-                        
-                        <div class="activity-meta">
-                            <span>
-                                <i class="fas fa-calendar"></i>
-                                @activity.StartDate?.ToString("yyyy/MM/dd")
-                            </span>
-                            <span>
-                                <i class="fas fa-users"></i>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center" style="gap: 0.5rem;">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1&searchTerm=@Model.SearchTerm">
+                                    <i class="fas fa-chevron-right me-1"></i>ابتدا
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(Model.CurrentPage - 1)&searchTerm=@Model.SearchTerm">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                        {
+                            @if (i == Model.CurrentPage)
+                            {
+                                <li class="page-item active">
+                                    <span class="page-link">@i</span>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=@i&searchTerm=@Model.SearchTerm">@i</a>
+                                </li>
+                            }
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@(Model.CurrentPage + 1)&searchTerm=@Model.SearchTerm">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page=@Model.TotalPages&searchTerm=@Model.SearchTerm">
+                                    انتها<i class="fas fa-chevron-left me-1"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <!-- Empty State -->
+            @{
+                ViewBag.Icon = "fas fa-search";
+                ViewBag.Title = "فعالیتی یافت نشد";
+                ViewBag.Message = "در حال حاضر فعالیتی تطابق دارد. بعداً دوباره بررسی کنید یا یک فعالیت جدید ایجاد کنید.";
+                ViewBag.ActionUrl = User.IsInRole("Representative") ? Url.Action("Create", "Activity") : null;
+                ViewBag.ActionIcon = "fas fa-plus";
+                ViewBag.ActionText = "ایجاد فعالیت";
+            }
+            @await Html.PartialAsync("_EmptyState")
+        }
+    </div>
+</div>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+    }
+
+    .search-filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .activity-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .activity-card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        transform: translateY(-4px);
+    }
+
+    .badge {
+        font-weight: 600;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .bg-approved {
+        background-color: #d1fae5 !important;
+        color: #065f46 !important;
+    }
+
+    .bg-pending {
+        background-color: #fef3c7 !important;
+        color: #92400e !important;
+    }
+
+    .bg-rejected {
+        background-color: #fee2e2 !important;
+        color: #991b1b !important;
+    }
+
+    .activities-grid {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .pagination .page-link {
+        color: #1E40AF;
+        border: 1px solid #D1D5DB;
+        border-radius: 6px;
+    }
+
+    .pagination .page-link:hover {
+        background-color: #f0f9ff;
+        border-color: #1E40AF;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #1E40AF;
+        border-color: #1E40AF;
+    }
+
+    .input-group-text {
+        background-color: white;
+        color: #1E40AF;
+    }
+</style>
+
+@functions {
+    private string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "تایید شده" => "success",
+            "Approved" => "success",
+            "در انتظار" => "warning",
+            "Pending" => "warning",
+            "رد شده" => "danger",
+            "Rejected" => "danger",
+            _ => "secondary"
+        };
+    }
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize search and filter
+            const config = {
+                searchInputSelector: '[data-search]',
+                filterSelectors: {
+                    status: '[data-filter="status"]'
+                },
+                tableSelector: 'tbody',
+                minChars: 1
+            };
+
+            if (window.SearchFilterManager) {
+                const manager = new SearchFilterManager(config);
+                
+                // Listen for search complete event
+                document.addEventListener('search-complete', function(e) {
+                    const { visibleCount, totalCount } = e.detail;
+                    const filterInfo = document.getElementById('active-filters');
+                    if (visibleCount < totalCount) {
+                        document.getElementById('filter-count').textContent = visibleCount;
+                        filterInfo.style.display = 'block';
+                    } else {
+                        filterInfo.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+}
                                 @activity.ParticipantsCount
                             </span>
                         </div>

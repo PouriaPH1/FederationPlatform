@@ -1,0 +1,36 @@
+@* Empty State Component - Partial View *@
+
+<div class="empty-state-container" style="text-align: center; padding: 60px 20px;">
+    <div class="empty-state-icon" style="margin-bottom: 20px;">
+        <i class="@ViewBag.Icon" style="font-size: 64px; color: #D1D5DB;"></i>
+    </div>
+    
+    <h4 style="color: #374151; margin-bottom: 10px;">
+        @ViewBag.Title
+    </h4>
+    
+    <p style="color: #6B7280; margin-bottom: 20px;">
+        @ViewBag.Message
+    </p>
+    
+    @if (!string.IsNullOrEmpty(ViewBag.ActionUrl))
+    {
+        <a href="@ViewBag.ActionUrl" class="btn btn-primary" style="margin-top: 20px;">
+            <i class="@ViewBag.ActionIcon"></i>
+            @ViewBag.ActionText
+        </a>
+    }
+</div>
+
+<style>
+    .empty-state-container {
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        background-color: #F9FAFB;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+</style>

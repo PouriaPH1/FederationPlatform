@@ -1,0 +1,49 @@
+@* File Upload Widget - Partial View *@
+
+<div class="file-upload-container">
+    <div class="file-upload-zone" data-file-upload="@ViewBag.FileInputId" data-preview="@ViewBag.PreviewId">
+        <div style="text-align: center; padding: 40px 20px;">
+            <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #1E40AF; margin-bottom: 15px;"></i>
+            <h5 style="margin-bottom: 10px; color: #333;">فایل‌های خود را بکشید و رها کنید</h5>
+            <p style="color: #666; margin-bottom: 0;">یا روی این ناحیه کلیک کنید</p>
+            <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                حد اکثر حجم: 10MB | انواع مجاز: تصویر، PDF، Word
+            </p>
+        </div>
+    </div>
+
+    <div id="@ViewBag.PreviewId" class="file-preview-container" style="margin-top: 20px;">
+        <!-- Files will be previewed here -->
+    </div>
+
+    <input type="file" 
+           id="@ViewBag.FileInputId" 
+           name="@ViewBag.FieldName" 
+           multiple 
+           style="display: none;" 
+           accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx">
+</div>
+
+<style>
+    .file-upload-zone {
+        border: 2px dashed #1E40AF;
+        border-radius: 8px;
+        background-color: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .file-upload-zone:hover {
+        border-color: #0EA5E9;
+        background-color: #f0f9ff;
+    }
+
+    .file-upload-zone.dragover {
+        border-color: #0EA5E9;
+        background-color: #dbeafe;
+    }
+
+    .file-preview-item {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+</style>

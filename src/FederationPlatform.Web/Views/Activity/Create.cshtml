@@ -5,99 +5,306 @@
 }
 
 <div class="page-header">
-    <h1>ایجاد فعالیت جدید</h1>
-    <p>لطفاً اطلاعات فعالیت را پر کنید</p>
+    <h1><i class="fas fa-plus-circle me-2"></i>ایجاد فعالیت جدید</h1>
+    <p>لطفاً اطلاعات فعالیت را پر کنید و فایل‌های مورد نیاز را بارگذاری کنید</p>
 </div>
 
 <div class="container-fluid py-4">
     <div class="row">
         <div class="col-lg-8 mx-auto">
-            <form method="post" asp-action="Create" enctype="multipart/form-data" novalidate>
-                <div class="form-section">
-                    <h3 class="section-title">اطلاعات پایه</h3>
+            <form method="post" asp-action="Create" enctype="multipart/form-data" data-validate="true" novalidate>
+                <!-- Basic Information Section -->
+                <div class="form-section fade-in">
+                    <h3 class="section-title"><i class="fas fa-info-circle me-2"></i>اطلاعات پایه</h3>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label" asp-for="Title"></label>
-                        <input type="text" class="form-control" asp-for="Title" required>
-                        <span class="form-text" asp-validation-for="Title"></span>
+                        <label class="form-label" asp-for="Title">
+                            <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.Title)
+                        </label>
+                        <input type="text" class="form-control" asp-for="Title" required minlength="5" maxlength="200" placeholder="عنوان فعالیت را وارد کنید">
+                        <span class="form-text text-muted" asp-validation-for="Title"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="form-label" asp-for="Description"></label>
-                        <textarea class="form-control" asp-for="Description" rows="4" required></textarea>
-                        <span class="form-text" asp-validation-for="Description"></span>
+                        <label class="form-label" asp-for="Description">
+                            <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.Description)
+                        </label>
+                        <textarea class="form-control" asp-for="Description" rows="4" required minlength="10" placeholder="توضیحات فعالیت..."></textarea>
+                        <span class="form-text text-muted" asp-validation-for="Description"></span>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label class="form-label" asp-for="UniversityId"></label>
+                                <label class="form-label" asp-for="UniversityId">
+                                    <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.UniversityId)
+                                </label>
                                 <select class="form-select" asp-for="UniversityId" asp-items="@(new SelectList(Model.Universities, "Id", "Name"))" required>
-                                    <option value="">انتخاب دانشگاه</option>
+                                    <option value="">-- انتخاب دانشگاه --</option>
                                 </select>
-                                <span class="form-text" asp-validation-for="UniversityId"></span>
+                                <span class="form-text text-muted" asp-validation-for="UniversityId"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label class="form-label" asp-for="Category"></label>
+                                <label class="form-label">
+                                    <span class="required-badge">*</span>نوع فعالیت
+                                </label>
                                 <select class="form-select" asp-for="Category" required>
-                                    <option value="">انتخاب دسته</option>
+                                    <option value="">-- انتخاب نوع --</option>
                                     <option value="Workshop">کارگاه</option>
                                     <option value="Seminar">سمینار</option>
                                     <option value="Conference">کنفرانس</option>
                                     <option value="Training">آموزش</option>
+                                    <option value="Competition">مسابقه</option>
+                                    <option value="Meeting">جلسه</option>
                                     <option value="Other">دیگر</option>
                                 </select>
-                                <span class="form-text" asp-validation-for="Category"></span>
+                                <span class="form-text text-muted" asp-validation-for="Category"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h3 class="section-title">تاریخ و زمان</h3>
+                <!-- Date & Time Section -->
+                <div class="form-section fade-in-delayed">
+                    <h3 class="section-title"><i class="fas fa-calendar-alt me-2"></i>تاریخ و زمان</h3>
                     
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label class="form-label" asp-for="StartDate"></label>
-                                <input type="datetime-local" class="form-control" asp-for="StartDate" required>
-                                <span class="form-text" asp-validation-for="StartDate"></span>
+                                <label class="form-label" asp-for="StartDate">
+                                    <span class="required-badge">*</span>تاریخ شروع
+                                </label>
+                                <input type="datetime-local" class="form-control persian-date" asp-for="StartDate" required>
+                                <span class="form-text text-muted" asp-validation-for="StartDate"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group mb-3">
-                                <label class="form-label" asp-for="EndDate"></label>
-                                <input type="datetime-local" class="form-control" asp-for="EndDate" required>
-                                <span class="form-text" asp-validation-for="EndDate"></span>
+                                <label class="form-label" asp-for="EndDate">
+                                    <span class="required-badge">*</span>تاریخ پایان
+                                </label>
+                                <input type="datetime-local" class="form-control persian-date" asp-for="EndDate" required>
+                                <span class="form-text text-muted" asp-validation-for="EndDate"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h3 class="section-title">مکان و شرکت کنندگان</h3>
+                <!-- Location & Participants Section -->
+                <div class="form-section fade-in-delayed">
+                    <h3 class="section-title"><i class="fas fa-map-marker-alt me-2"></i>مکان و شرکت کنندگان</h3>
                     
                     <div class="form-group mb-3">
-                        <label class="form-label" asp-for="Location"></label>
-                        <input type="text" class="form-control" asp-for="Location" placeholder="آدرس یا نام مکان">
-                        <span class="form-text" asp-validation-for="Location"></span>
+                        <label class="form-label" asp-for="Location">
+                            <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.Location)
+                        </label>
+                        <input type="text" class="form-control" asp-for="Location" placeholder="آدرس یا نام مکان" required minlength="3">
+                        <span class="form-text text-muted" asp-validation-for="Location"></span>
                     </div>
 
                     <div class="form-group mb-3">
-                        <label class="form-label" asp-for="ExpectedParticipants"></label>
-                        <input type="number" class="form-control" asp-for="ExpectedParticipants" min="1" required>
-                        <span class="form-text" asp-validation-for="ExpectedParticipants"></span>
+                        <label class="form-label" asp-for="ExpectedParticipants">
+                            <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.ExpectedParticipants)
+                        </label>
+                        <input type="number" class="form-control" asp-for="ExpectedParticipants" min="1" max="10000" required>
+                        <span class="form-text text-muted" asp-validation-for="ExpectedParticipants"></span>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h3 class="section-title">فایل‌ها و جزئیات</h3>
+                <!-- Files & Details Section -->
+                <div class="form-section fade-in-delayed">
+                    <h3 class="section-title"><i class="fas fa-file-upload me-2"></i>فایل‌ها و جزئیات</h3>
                     
                     <div class="form-group mb-3">
                         <label class="form-label">فایل‌های پیوستی</label>
-                        <div class="file-upload-area">
+                        <div class="file-upload-zone" data-file-upload="#activityFiles" data-preview="#filesPreview">
+                            <div style="text-align: center; padding: 40px 20px;">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #1E40AF; margin-bottom: 15px;"></i>
+                                <h5 style="margin-bottom: 10px; color: #333;">فایل‌های خود را بکشید و رها کنید</h5>
+                                <p style="color: #666; margin-bottom: 0;">یا روی این ناحیه کلیک کنید</p>
+                                <p style="font-size: 12px; color: #999; margin-top: 10px;">
+                                    <i class="fas fa-info-circle me-2"></i>حد اکثر حجم: 10MB | انواع: PDF, Word, Excel, تصویر
+                                </p>
+                            </div>
+                        </div>
+                        <div id="filesPreview" style="margin-top: 20px;"></div>
+                        <input type="file" id="activityFiles" name="Files" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif" style="display: none;">
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label" asp-for="Budget">
+                            @Html.DisplayNameFor(m => m.Budget)
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" asp-for="Budget" min="0" step="1000" placeholder="0" value="0">
+                            <span class="input-group-text"><i class="fas fa-rial-sign me-2"></i>ریال</span>
+                        </div>
+                        <span class="form-text text-muted" asp-validation-for="Budget"></span>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions" style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 30px;">
+                    <a href="@Url.Action("Index", "Activity")" class="btn btn-lg btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>لغو
+                    </a>
+                    <button type="submit" class="btn btn-lg btn-primary">
+                        <i class="fas fa-check me-2"></i>ایجاد فعالیت
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #1E40AF 0%, #0EA5E9 100%);
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+    }
+
+    .page-header h1 {
+        margin: 0 0 10px 0;
+        font-weight: 600;
+    }
+
+    .page-header p {
+        margin: 0;
+        opacity: 0.95;
+        font-size: 0.95rem;
+    }
+
+    .form-section {
+        background: white;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f0f0f0;
+    }
+
+    .form-section:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+        color: #1E40AF;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .required-badge {
+        color: #EF4444;
+        margin-left: 5px;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-control, .form-select {
+        border: 1px solid #D1D5DB;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-family: 'Vazirmatn', sans-serif;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #1E40AF;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+
+    .file-upload-zone {
+        border: 2px dashed #1E40AF;
+        border-radius: 8px;
+        background-color: #f9fafb;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .file-upload-zone:hover {
+        border-color: #0EA5E9;
+        background-color: #f0f9ff;
+    }
+
+    .file-upload-zone.dragover {
+        border-color: #0EA5E9;
+        background-color: #dbeafe;
+        transform: scale(1.01);
+    }
+
+    .form-actions {
+        margin-top: 2rem;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(30, 64, 175, 0.3);
+    }
+
+    .text-muted {
+        font-size: 0.85rem;
+        color: #6B7280 !important;
+    }
+
+    .input-group-text {
+        background-color: #F3F4F6;
+        border: 1px solid #D1D5DB;
+        border-radius: 0 8px 8px 0;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        // Initialize Persian Date Picker
+        document.addEventListener('DOMContentLoaded', function() {
+            const persianDateInputs = document.querySelectorAll('.persian-date');
+            persianDateInputs.forEach(input => {
+                // You can initialize Persian date picker here if the library is loaded
+                // $(input).persianDatepicker({...options...});
+            });
+
+            // Initialize form validation
+            const form = document.querySelector('form');
+            if (form && window.FormValidator) {
+                new FormValidator(form);
+            }
+
+            // Initialize file upload
+            if (window.FileUploadManager) {
+                new FileUploadManager('[data-file-upload="#activityFiles"]', '#activityFiles', '#filesPreview');
+            }
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            });
+        });
+    </script>
+}
                             <input type="file" id="files" name="Files" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.png,.zip" class="form-control">
                             <small class="text-muted d-block mt-2">حداکثر اندازه: 10MB. فرمت‌های مجاز: PDF, Word, Excel, تصاویر, ZIP</small>
                         </div>
