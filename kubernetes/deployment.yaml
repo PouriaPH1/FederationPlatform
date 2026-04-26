@@ -1,0 +1,165 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: federation-platform
+  namespace: default
+  labels:
+    app: federation-platform
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: federation-platform
+  template:
+    metadata:
+      labels:
+        app: federation-platform
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/your-org/federation-platform:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: federation-secrets
+              key: database-connection-string
+        - name: EmailSettings__SmtpServer
+          valueFrom:
+            configMapKeyRef:
+              name: federation-config
+              key: smtp-server
+        - name: EmailSettings__SmtpPort
+          valueFrom:
+            configMapKeyRef:
+              name: federation-config
+              key: smtp-port
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/wwwroot/uploads
+        - name: logs
+          mountPath: /app/Logs
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: federation-uploads-pvc
+      - name: logs
+        persistentVolumeClaim:
+          claimName: federation-logs-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: federation-platform-service
+  namespace: default
+spec:
+  type: LoadBalancer
+  selector:
+    app: federation-platform
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+    name: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: federation-config
+  namespace: default
+data:
+  smtp-server: "smtp.gmail.com"
+  smtp-port: "587"
+  application-name: "Federation Platform"
+  application-url: "https://federation.ir"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: federation-secrets
+  namespace: default
+type: Opaque
+stringData:
+  database-connection-string: "Server=sqlserver;Database=FederationPlatformDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True"
+  smtp-username: "your-email@gmail.com"
+  smtp-password: "your-app-password"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: federation-uploads-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: federation-logs-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: federation-platform-hpa
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: federation-platform
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80

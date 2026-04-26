@@ -1,0 +1,109 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: federation-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - federation-network
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  # Federation Platform Web Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: federation-web
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=FederationPlatformDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SenderEmail=noreply@federation.ir
+      - EmailSettings__SenderName=Federation Platform
+      - EmailSettings__Username=${SMTP_USERNAME}
+      - EmailSettings__Password=${SMTP_PASSWORD}
+      - EmailSettings__EnableSsl=true
+      - FileUploadSettings__MaxFileSizeInMB=10
+      - FileUploadSettings__AllowedExtensions=.jpg,.jpeg,.png,.pdf,.doc,.docx
+      - FileUploadSettings__UploadPath=/app/wwwroot/uploads
+    ports:
+      - "5000:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - uploads-data:/app/wwwroot/uploads
+      - logs-data:/app/Logs
+    networks:
+      - federation-network
+    restart: unless-stopped
+    healthcheck:
+      test: curl -f http://localhost:8080/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis Cache (Optional - for future caching implementation)
+  redis:
+    image: redis:7-alpine
+    container_name: federation-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - federation-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  # Nginx Reverse Proxy (Optional - for production)
+  nginx:
+    image: nginx:alpine
+    container_name: federation-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - logs-data:/var/log/nginx
+    depends_on:
+      - web
+    networks:
+      - federation-network
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+    driver: local
+  uploads-data:
+    driver: local
+  logs-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  federation-network:
+    driver: bridge

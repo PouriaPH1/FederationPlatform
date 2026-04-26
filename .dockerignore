@@ -1,0 +1,33 @@
+# Directories
+**/bin/
+**/obj/
+**/out/
+**/TestResults/
+**/node_modules/
+**/.vs/
+**/.vscode/
+**/.idea/
+**/wwwroot/uploads/
+
+# Files
+**/*.user
+**/*.suo
+**/.DS_Store
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/.env
+**/.env.local
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  # SQL Server for Development
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: federation-sqlserver-dev
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Dev@Passw0rd123
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-dev-data:/var/opt/mssql
+    networks:
+      - federation-dev-network
+
+  # Development Web Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: build
+    container_name: federation-web-dev
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=FederationPlatformDb_Dev;User Id=sa;Password=Dev@Passw0rd123;TrustServerCertificate=True;MultipleActiveResultSets=true
+      - EmailSettings__SmtpServer=localhost
+      - EmailSettings__SmtpPort=1025
+      - EmailSettings__EnableSsl=false
+    ports:
+      - "5000:8080"
+    depends_on:
+      - sqlserver
+    volumes:
+      - ./src:/src
+      - uploads-dev-data:/app/wwwroot/uploads
+      - logs-dev-data:/app/Logs
+    networks:
+      - federation-dev-network
+    command: dotnet watch run --project /src/src/FederationPlatform.Web/FederationPlatform.Web.csproj
+
+  # MailHog for Email Testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: federation-mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - federation-dev-network
+
+volumes:
+  sqlserver-dev-data:
+    driver: local
+  uploads-dev-data:
+    driver: local
+  logs-dev-data:
+    driver: local
+
+networks:
+  federation-dev-network:
+    driver: bridge
