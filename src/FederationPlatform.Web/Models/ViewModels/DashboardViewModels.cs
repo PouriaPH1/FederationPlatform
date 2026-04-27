@@ -5,6 +5,7 @@ namespace FederationPlatform.Web.Models.ViewModels;
 public class DashboardViewModel
 {
     public string? UserRole { get; set; }
+    public string UserName { get; set; } = string.Empty;
     public UserDashboardViewModel? UserDashboard { get; set; }
     public RepresentativeDashboardViewModel? RepresentativeDashboard { get; set; }
     public AdminDashboardViewModel? AdminDashboard { get; set; }
@@ -14,10 +15,15 @@ public class UserDashboardViewModel
 {
     public int UserId { get; set; }
     public string FullName { get; set; } = string.Empty;
+    public int MyActivitiesCount { get; set; }
+    public int ApprovedActivitiesCount { get; set; }
+    public int PendingActivitiesCount { get; set; }
+    public int JoinedActivitiesCount { get; set; }
+    public string UserRole { get; set; } = string.Empty;
     public List<NewsItemViewModel>? RecentNews { get; set; }
     public List<WorkshopItemViewModel>? UpcomingWorkshops { get; set; }
     public List<UniversityBriefViewModel>? Universities { get; set; }
-    public List<ActivityDetailViewModel>? MyActivities { get; set; }
+    public List<ActivityBriefViewModel>? MyActivities { get; set; }
     public List<ActivityDetailViewModel>? JoinedActivities { get; set; }
     public int TotalActivities { get; set; }
     public int PendingActivities { get; set; }
@@ -28,7 +34,7 @@ public class RepresentativeDashboardViewModel
     public int UserId { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string? UniversityName { get; set; }
-    public List<ActivityDetailViewModel>? MyActivities { get; set; }
+    public List<ActivityBriefViewModel>? MyActivities { get; set; }
     public int PendingActivityCount { get; set; }
     public int ApprovedActivityCount { get; set; }
     public int RejectedActivityCount { get; set; }
@@ -40,6 +46,7 @@ public class RepresentativeDashboardViewModel
 public class AdminDashboardViewModel
 {
     public int TotalUsers { get; set; }
+    public List<UserAdminViewModel>? AllUsers { get; set; }
     public int TotalActivities { get; set; }
     public int PendingActivities { get; set; }
     public int PendingActivitiesCount { get; set; }
@@ -61,6 +68,14 @@ public class PendingActivityViewModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string RepresentativeName { get; set; } = string.Empty;
+    public DateTime SubmitDate { get; set; }
+    public DateTime StartDate { get; set; }
+    public string? Location { get; set; }
+    public int ExpectedParticipants { get; set; }
+    public string? Category { get; set; }
+    public List<ActivityFileViewModel>? Files { get; set; }
     public string? UniversityName { get; set; }
     public string? OrganizationName { get; set; }
     public string? CreatedByName { get; set; }
@@ -86,6 +101,7 @@ public class UserAdminViewModel
 public class ActivityStatViewModel
 {
     public string Label { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
     public int Count { get; set; }
 }
 

@@ -1,9 +1,11 @@
 using FederationPlatform.Application.Interfaces;
+using FederationPlatform.Application.Services;
 using FederationPlatform.Infrastructure.Data;
 using FederationPlatform.Infrastructure.Identity;
 using FederationPlatform.Infrastructure.Repositories;
 using FederationPlatform.Infrastructure.Services;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,12 +16,42 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        // Add HttpContextAccessor
+        services.AddHttpContextAccessor();
+
         // Add DbContext
-        var connectionString = configuration.GetConnectionString("DefaultConnection") 
+        var defaultConnectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-        
+
+        var databaseProvider = configuration["DatabaseProvider"] ?? "SqlServer";
+
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(connectionString));
+        {
+            if (string.Equals(databaseProvider, "Sqlite", StringComparison.OrdinalIgnoreCase))
+            {
+                var sqliteConnectionString = configuration.GetConnectionString("SqliteConnection");
+                var sqliteFallbackConnection = "Data Source=FederationPlatform.db";
+
+                var effectiveSqliteConnection = !string.IsNullOrWhiteSpace(sqliteConnectionString)
+                    ? sqliteConnectionString
+                    : defaultConnectionString;
+
+                // If environment variables inject a SQL Server-style DefaultConnection,
+                // keep local development resilient by falling back to a file-based SQLite DB.
+                if (effectiveSqliteConnection.Contains("Server=", StringComparison.OrdinalIgnoreCase))
+                {
+                    effectiveSqliteConnection = sqliteFallbackConnection;
+                }
+
+                options.UseSqlite(effectiveSqliteConnection);
+                return;
+            }
+
+            options.UseSqlServer(defaultConnectionString, sqlOptions =>
+            {
+                sqlOptions.EnableRetryOnFailure(maxRetryCount: 5);
+            });
+        });
 
         // Add Repositories
         services.AddScoped<IUserRepository, UserRepository>();
@@ -38,7 +70,11 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
 
         // Add File Service
-        services.AddScoped<IFileService, FileService>();
+        services.AddScoped<Infrastructure.Services.IFileService, FileService>();
+        services.AddScoped<Application.Services.IFileService, ApplicationFileService>();
+
+        // Add Email Service
+        services.AddScoped<Application.Services.IEmailService, EmailService>();
 
         return services;
     }

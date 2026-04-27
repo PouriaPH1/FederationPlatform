@@ -6,7 +6,9 @@ public class ActivityBriefViewModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string UniversityName { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public string? Location { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public ActivityStatus Status { get; set; }
@@ -19,8 +21,9 @@ public class UniversityCardViewModel
     public string Province { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
     public string? LogoUrl { get; set; }
-    public int ActivityCount { get; set; }
-    public int RepresentativeCount { get; set; }
+    public int ActivitiesCount { get; set; }
+    public int MembersCount { get; set; }
+    public int NewsCount { get; set; }
 }
 
 public class CreateActivityRequest

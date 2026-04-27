@@ -9,6 +9,7 @@ public class UniversityDto
     public string? LogoUrl { get; set; }
     public bool IsActive { get; set; }
     public IList<ActivityListDto>? Activities { get; set; }
+    public IList<UserDto>? Representatives { get; set; }
 }
 
 public class UniversityDetailDto : UniversityDto
@@ -18,5 +19,5 @@ public class UniversityDetailDto : UniversityDto
     public int ActivityCount { get; set; }
     public int RepresentativeCount { get; set; }
     public IList<ActivityListDto>? RecentActivities { get; set; } = new List<ActivityListDto>();
-    public IList<UserDto>? Representatives { get; set; }
+    public new IList<UserDto>? Representatives { get; set; }
 }

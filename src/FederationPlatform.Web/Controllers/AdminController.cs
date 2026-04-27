@@ -1,3 +1,4 @@
+using FederationPlatform.Application.DTOs;
 using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
 using FederationPlatform.Web.Models.ViewModels;
@@ -59,7 +60,8 @@ public class AdminController : Controller
                     AllUsers = allUsers?.Select(u => new UserAdminViewModel
                     {
                         Id = u.Id,
-                        FullName = u.FirstName + " " + u.LastName,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
                         Email = u.Email,
                         UniversityName = "دانشگاه",
                         RegisterDate = u.CreatedAt
@@ -87,17 +89,17 @@ public class AdminController : Controller
                 AdminDashboard = new AdminDashboardViewModel
                 {
                     PendingActivitiesCount = pendingActivities?.Count() ?? 0,
-                    PendingActivities = pendingActivities?.Select(a => new PendingActivityViewModel
+                    PendingActivityList = pendingActivities?.Select(a => new PendingActivityViewModel
                     {
                         Id = a.Id,
                         Title = a.Title,
                         Description = a.Description,
-                        UniversityName = a.University?.Name ?? "",
-                        RepresentativeName = a.Representative?.UserName ?? "",
+                        UniversityName = a.UniversityName ?? "",
+                        RepresentativeName = a.Representative ?? "",
                         SubmitDate = a.CreatedAt,
                         StartDate = a.StartDate,
                         Location = a.Location,
-                        ExpectedParticipants = a.ParticipantCount,
+                        ExpectedParticipants = a.ParticipantCount ?? 0,
                         Category = a.Category
                     }).ToList() ?? new List<PendingActivityViewModel>()
                 }
@@ -124,8 +126,8 @@ public class AdminController : Controller
 
             var result = await _activityService.ApproveActivityAsync(activityId);
             
-            if (!result.Succeeded)
-                return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در تایید");
+            if (!result)
+                return BadRequest("خطا در تایید");
 
             // Send notification to representative
             await _notificationService.SendActivityApprovalNotificationAsync(
@@ -171,10 +173,10 @@ public class AdminController : Controller
             if (activity == null)
                 return NotFound();
 
-            var result = await _activityService.RejectActivityAsync(activityId, rejectionReason);
+            var result = await _activityService.RejectActivityAsync(activityId);
             
-            if (!result.Succeeded)
-                return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در رد کردن");
+            if (!result)
+                return BadRequest("خطا در رد کردن");
 
             // Send notification to representative
             await _notificationService.SendActivityRejectionNotificationAsync(
@@ -239,6 +241,7 @@ public class AdminController : Controller
 
     public async Task<IActionResult> ManageNews()
     {
+
         try
         {
             var news = await _newsService.GetAllNewsAsync();
@@ -258,7 +261,7 @@ public class AdminController : Controller
                             PublishedAt = n.PublishedAt,
                             CreatedByName = n.CreatedByUsername
                         }).ToList() ?? new List<NewsItemViewModel>(),
-                        TotalCount = news?.Count ?? 0
+                        TotalCount = news?.Count() ?? 0
                     }
                 }
             };

@@ -7,6 +7,7 @@ public class NewsDto
     public string Content { get; set; } = string.Empty;
     public string? ImageUrl { get; set; }
     public DateTime PublishedAt { get; set; }
+    public DateTime PublishDate { get; set; }
     public bool IsPublished { get; set; }
     public int CreatedBy { get; set; }
     public string CreatedByUsername { get; set; } = string.Empty;

@@ -1,5 +1,6 @@
 using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
+using FederationPlatform.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FederationPlatform.Web.Controllers;
@@ -31,16 +32,16 @@ public class HomeController : Controller
         try
         {
             var universities = await _universityService.GetAllUniversitiesAsync();
-            var activities = await _activityService.GetApprovedActivitiesAsync(pageNumber: 1, pageSize: 10);
-            var news = await _newsService.GetRecentNewsAsync(pageNumber: 1, pageSize: 5);
+            var activities = await _activityService.GetApprovedActivitiesAsync();
+            var news = await _newsService.GetLatestNewsAsync(5);
             var userCount = await _userService.GetTotalUsersCountAsync();
 
             var model = new HomeViewModel
             {
                 UniversitiesCount = universities?.Count() ?? 0,
-                ActivitiesCount = activities?.Items?.Count() ?? 0,
+                ActivitiesCount = activities?.Count() ?? 0,
                 UsersCount = userCount,
-                NewsCount = news?.Items?.Count() ?? 0,
+                NewsCount = news?.Count() ?? 0,
                 Universities = universities?.Take(6).Select(u => new UniversityBriefViewModel
                 {
                     Id = u.Id,
@@ -48,20 +49,22 @@ public class HomeController : Controller
                     City = u.City,
                     ActivityCount = 0
                 }).ToList() ?? new List<UniversityBriefViewModel>(),
-                News = news?.Items?.Select(n => new NewsItemViewModel
+                News = news?.Select(n => new NewsItemViewModel
                 {
                     Id = n.Id,
                     Title = n.Title,
                     Content = n.Content,
                     PublishDate = n.PublishDate
                 }).ToList() ?? new List<NewsItemViewModel>(),
-                RecentActivities = activities?.Items?.Select(a => new ActivityBriefViewModel
+                RecentActivities = activities?.Select(a => new ActivityBriefViewModel
                 {
                     Id = a.Id,
                     Title = a.Title,
                     Description = a.Description,
                     StartDate = a.StartDate,
-                    Status = a.IsApproved ? "تایید شده" : "در انتظار"
+                    Location = a.Location,
+                    UniversityName = a.UniversityName,
+                    Status = a.Status
                 }).ToList() ?? new List<ActivityBriefViewModel>()
             };
 

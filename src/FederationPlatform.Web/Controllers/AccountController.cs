@@ -41,36 +41,27 @@ public class AccountController : Controller
         {
             var result = await _identityService.LoginAsync(model.Username, model.Password);
             
-            if (!result.Succeeded)
+            if (!result.Success || result.User == null)
             {
                 model.ErrorMessage = "نام کاربری یا رمز عبور نادرست است";
                 return View(model);
             }
 
-            var user = result.Data;
+            var user = result.User;
             
             // Create claims
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Email, user.Email ?? "")
             };
-
-            // Add roles as claims
-            if (user.Roles?.Any() ?? false)
-            {
-                foreach (var role in user.Roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role));
-                }
-            }
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var authProperties = new AuthenticationProperties
             {
-                IsPersistent = model.RememberMe,
-                ExpiresUtc = model.RememberMe ? DateTimeOffset.UtcNow.AddDays(30) : DateTimeOffset.UtcNow.AddHours(8)
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddDays(30)
             };
 
             await HttpContext.SignInAsync(
@@ -106,19 +97,11 @@ public class AccountController : Controller
 
         try
         {
-            var registerDto = new RegisterRequest
-            {
-                Username = model.Username,
-                Email = model.Email,
-                Password = model.Password,
-                ConfirmPassword = model.ConfirmPassword
-            };
-
-            var result = await _identityService.RegisterAsync(registerDto);
+            var result = await _identityService.RegisterAsync(model.Username, model.Email, model.Password);
             
-            if (!result.Succeeded)
+            if (!result.Success)
             {
-                model.ErrorMessage = result.Messages?.FirstOrDefault() ?? "خطایی در ثبت‌نام رخ داد";
+                model.ErrorMessage = result.Message ?? "خطایی در ثبت‌نام رخ داد";
                 return View(model);
             }
 
@@ -142,25 +125,22 @@ public class AccountController : Controller
         try
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var userIdInt))
                 return RedirectToAction("Login");
 
-            var userProfile = await _identityService.GetUserProfileAsync(userId);
+            var userProfile = await _identityService.GetUserProfileAsync(userIdInt);
             if (userProfile == null)
                 return NotFound();
 
             var model = new ProfileViewModel
             {
-                Username = userProfile.UserName,
+                Username = userProfile.Username,
                 Email = userProfile.Email,
-                FirstName = userProfile.FirstName,
-                LastName = userProfile.LastName,
-                Phone = userProfile.Phone,
-                Address = userProfile.Address,
-                City = userProfile.City,
-                PostalCode = userProfile.PostalCode,
+                FirstName = userProfile.UserProfile?.FirstName ?? "",
+                LastName = userProfile.UserProfile?.LastName ?? "",
+                Phone = userProfile.UserProfile?.PhoneNumber ?? "",
                 Role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User",
-                UniversityId = userProfile.UniversityId
+                UniversityId = userProfile.UserProfile?.UniversityId ?? 0
             };
 
             return View(model);
@@ -182,25 +162,20 @@ public class AccountController : Controller
         try
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var userIdInt))
                 return RedirectToAction("Login");
 
-            var updateDto = new UpdateProfileRequest
-            {
-                UserId = userId,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Phone = model.Phone,
-                Address = model.Address,
-                City = model.City,
-                PostalCode = model.PostalCode,
-                UniversityId = model.UniversityId
-            };
-
-            var result = await _identityService.UpdateProfileAsync(updateDto);
+            var (success, message) = await _identityService.UpdateProfileAsync(
+                userIdInt,
+                model.FirstName,
+                model.LastName,
+                model.Phone,
+                model.Address,
+                model.City,
+                model.PostalCode);
             
-            if (!result.Succeeded)
-                return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در به‌روزرسانی پروفایل");
+            if (!success)
+                return BadRequest(message ?? "خطا در به‌روزرسانی پروفایل");
 
             return RedirectToAction("Profile", new { message = "پروفایل با موفقیت به‌روزرسانی شد" });
         }
@@ -235,13 +210,13 @@ public class AccountController : Controller
         try
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userId) || !int.TryParse(userId, out var userIdInt))
                 return RedirectToAction("Login");
 
-            var result = await _identityService.PromoteToRepresentativeAsync(userId);
+            var result = await _identityService.PromoteToRepresentativeAsync(userIdInt);
             
-            if (!result.Succeeded)
-                return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در ترقی");
+            if (!result)
+                return BadRequest("خطا در ترقی");
 
             // Update claims
             var claims = new List<Claim>

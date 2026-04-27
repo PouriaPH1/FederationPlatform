@@ -26,8 +26,8 @@ namespace FederationPlatform.UnitTests.Services
             // Arrange
             var createDto = new CreateNewsDto
             {
-                Title = \"Important News\",
-                Content = \"News content here\",
+                Title = "Important News",
+                Content = "News content here",
                 CreatedBy = 1
             };
 
@@ -48,9 +48,9 @@ namespace FederationPlatform.UnitTests.Services
             // Arrange
             var newsList = new List<News>
             {
-                new News { Id = 1, Title = \"News 1\", IsPublished = true },
-                new News { Id = 2, Title = \"News 2\", IsPublished = false },
-                new News { Id = 3, Title = \"News 3\", IsPublished = true }
+                new News { Id = 1, Title = "News 1", IsPublished = true },
+                new News { Id = 2, Title = "News 2", IsPublished = false },
+                new News { Id = 3, Title = "News 3", IsPublished = true }
             };
 
             _mockNewsRepository.Setup(x => x.GetAllAsync())
@@ -71,11 +71,11 @@ namespace FederationPlatform.UnitTests.Services
             var newsId = 1;
             var updateDto = new UpdateNewsDto
             {
-                Title = \"Updated Title\",
-                Content = \"Updated Content\"
+                Title = "Updated Title",
+                Content = "Updated Content"
             };
 
-            var news = new News { Id = newsId, Title = \"Old Title\" };
+            var news = new News { Id = newsId, Title = "Old Title" };
 
             _mockNewsRepository.Setup(x => x.GetByIdAsync(newsId))
                 .ReturnsAsync(news);
@@ -87,7 +87,7 @@ namespace FederationPlatform.UnitTests.Services
 
             // Assert
             result.Success.Should().BeTrue();
-            news.Title.Should().Be(\"Updated Title\");
+            news.Title.Should().Be("Updated Title");
         }
 
         [Fact]

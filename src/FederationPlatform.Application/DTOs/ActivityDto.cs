@@ -11,12 +11,17 @@ public class ActivityDto
     public string ActivityTypeName { get; set; } = string.Empty;
     public int UniversityId { get; set; }
     public string UniversityName { get; set; } = string.Empty;
+    public string? University { get; set; }
     public int OrganizationId { get; set; }
     public string OrganizationName { get; set; } = string.Empty;
     public int UserId { get; set; }
     public string SubmittedBy { get; set; } = string.Empty;
+    public string? Representative { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public string? Location { get; set; }
+    public int ParticipantCount { get; set; }
+    public bool IsApproved { get; set; }
     public ActivityStatus Status { get; set; }
     public string StatusName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
@@ -34,11 +39,15 @@ public class ActivityListDto
     public ActivityType ActivityType { get; set; }
     public string ActivityTypeName { get; set; } = string.Empty;
     public string UniversityName { get; set; } = string.Empty;
+    public int UniversityId { get; set; }
+    public int OrganizationId { get; set; }
     public string? University { get; set; }
     public string OrganizationName { get; set; } = string.Empty;
     public string? Representative { get; set; }
+    public int? RepresentativeId { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public bool IsApproved { get; set; }
     public ActivityStatus Status { get; set; }
     public string StatusName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
@@ -54,6 +63,10 @@ public class CreateActivityDto
     public int OrganizationId { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public string? Location { get; set; }
+    public string? Category { get; set; }
+    public int ExpectedParticipants { get; set; }
+    public decimal Budget { get; set; }
 }
 
 public class UpdateActivityDto
@@ -101,6 +114,8 @@ public class PagedResultDto<T>
 
 public class ActivityStatisticDto
 {
+    public int Id { get; set; }
     public string Label { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
     public int Count { get; set; }
 }

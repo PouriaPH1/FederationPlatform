@@ -93,9 +93,9 @@ namespace FederationPlatform.IntegrationTests
             // Seed universities
             var universities = new[]
             {
-                new University { Name = \"University of Tehran\", Province = \"Tehran\", City = \"Tehran\", IsActive = true },
-                new University { Name = \"Sharif University\", Province = \"Tehran\", City = \"Tehran\", IsActive = true },
-                new University { Name = \"Isfahan University\", Province = \"Isfahan\", City = \"Isfahan\", IsActive = true }
+                new University { Name = "University of Tehran", Province = "Tehran", City = "Tehran", IsActive = true },
+                new University { Name = "Sharif University", Province = "Tehran", City = "Tehran", IsActive = true },
+                new University { Name = "Isfahan University", Province = "Isfahan", City = "Isfahan", IsActive = true }
             };
 
             await _dbContext.Universities.AddRangeAsync(universities);
@@ -109,8 +109,8 @@ namespace FederationPlatform.IntegrationTests
                 Username = email.Split('@')[0],
                 Email = email,
                 Password = password,
-                FirstName = \"Test\",
-                LastName = \"User\"
+                FirstName = "Test",
+                LastName = "User"
             };
 
             var result = await _authService.RegisterAsync(dto);
@@ -119,14 +119,14 @@ namespace FederationPlatform.IntegrationTests
 
         protected async Task<User> CreateTestRepresentativeAsync(string email)
         {
-            var user = await CreateTestUserAsync(email, \"Password123!\");
+            var user = await CreateTestUserAsync(email, "Password123!");
             await _userService.PromoteToRepresentativeAsync(user.Id);
             return await _userService.GetUserByIdAsync(user.Id);
         }
 
         protected async Task<User> CreateTestAdminAsync(string email)
         {
-            var user = await CreateTestUserAsync(email, \"Password123!\");
+            var user = await CreateTestUserAsync(email, "Password123!");
             user.Role = UserRole.Admin;
             await _userRepository.UpdateAsync(user);
             await _dbContext.SaveChangesAsync();
@@ -137,9 +137,9 @@ namespace FederationPlatform.IntegrationTests
         {
             var university = new University
             {
-                Name = $\"Test University {Guid.NewGuid()}\",
-                Province = \"Tehran\",
-                City = \"Tehran\",
+                Name = $"Test University {Guid.NewGuid()}",
+                Province = "Tehran",
+                City = "Tehran",
                 IsActive = true
             };
 
@@ -154,8 +154,8 @@ namespace FederationPlatform.IntegrationTests
 
             var activity = new Activity
             {
-                Title = $\"Test Activity {Guid.NewGuid()}\",
-                Description = \"Test activity description\",
+                Title = $"Test Activity {Guid.NewGuid()}",
+                Description = "Test activity description",
                 ActivityType = ActivityType.Event,
                 UniversityId = university.Id,
                 UserId = userId,

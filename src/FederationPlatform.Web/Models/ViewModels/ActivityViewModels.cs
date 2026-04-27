@@ -1,4 +1,5 @@
 using FederationPlatform.Domain.Enums;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace FederationPlatform.Web.Models.ViewModels;
@@ -50,8 +51,8 @@ public class CreateActivityViewModel
     [Display(Name = "فایل‌ها")]
     public IFormFileCollection? Files { get; set; }
 
-    public Dictionary<int, string>? Universities { get; set; }
-    public Dictionary<int, string>? Organizations { get; set; }
+    public List<SelectListItem>? Universities { get; set; }
+    public List<SelectListItem>? Organizations { get; set; }
     public string? ErrorMessage { get; set; }
 }
 
@@ -64,6 +65,9 @@ public class ActivityDetailViewModel
     public ActivityStatus Status { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+    public string? Location { get; set; }
+    public int ParticipantsCount { get; set; }
+    public bool IsApproved { get; set; }
     public string? UniversityName { get; set; }
     public string? OrganizationName { get; set; }
     public string? CreatedByName { get; set; }
@@ -84,14 +88,15 @@ public class ActivityListViewModel
     public int? OrganizationId { get; set; }
     public ActivityStatus? Status { get; set; }
     public string? SearchTerm { get; set; }
-    public Dictionary<int, string>? Universities { get; set; }
-    public Dictionary<int, string>? Organizations { get; set; }
+    public List<SelectListItem>? Universities { get; set; }
+    public List<SelectListItem>? Organizations { get; set; }
 }
 
 public class ActivityFileViewModel
 {
     public int Id { get; set; }
     public string FileName { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
     public string FilePath { get; set; } = string.Empty;
     public string FileType { get; set; } = string.Empty;
     public long FileSize { get; set; }
@@ -100,16 +105,17 @@ public class ActivityFileViewModel
 
 public class MyActivitiesViewModel
 {
-    public List<ActivityDetailViewModel>? PendingActivities { get; set; }
-    public List<ActivityDetailViewModel>? ApprovedActivities { get; set; }
-    public List<ActivityDetailViewModel>? RejectedActivities { get; set; }
-    public List<ActivityDetailViewModel>? Activities { get; set; }
+    public List<ActivityCardViewModel>? PendingActivities { get; set; }
+    public List<ActivityCardViewModel>? ApprovedActivities { get; set; }
+    public List<ActivityCardViewModel>? RejectedActivities { get; set; }
+    public List<ActivityCardViewModel>? Activities { get; set; }
 }
 
 public class ActivityCardViewModel
 {
     public int Id { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string RepresentativeName { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? UniversityName { get; set; }
     public string? OrganizationName { get; set; }

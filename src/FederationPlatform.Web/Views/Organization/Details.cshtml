@@ -1,3 +1,4 @@
+@using FederationPlatform.Domain.Enums
 @model FederationPlatform.Application.DTOs.OrganizationDto
 @{
     ViewData["Title"] = Model.Name;
@@ -72,11 +73,11 @@
                                             <td>@activity.UniversityName</td>
                                             <td>@activity.StartDate.ToString("yyyy/MM/dd")</td>
                                             <td>
-                                                @if (activity.Status == "Approved")
+                                                @if (activity.Status == ActivityStatus.Approved)
                                                 {
                                                     <span class="badge bg-success">تایید شده</span>
                                                 }
-                                                else if (activity.Status == "Pending")
+                                                else if (activity.Status == ActivityStatus.Pending)
                                                 {
                                                     <span class="badge bg-warning">در انتظار</span>
                                                 }

@@ -121,4 +121,36 @@ public class IdentityService : IIdentityService
             return false;
         }
     }
+
+    public async Task<User?> GetUserProfileAsync(int userId)
+    {
+        try
+        {
+            return await _unitOfWork.Users.GetByIdAsync(userId);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<(bool Success, string Message)> UpdateProfileAsync(int userId, string firstName, string lastName, string? phone, string? address, string? city, string? postalCode)
+    {
+        try
+        {
+            var user = await _unitOfWork.Users.GetByIdAsync(userId);
+            if (user == null)
+                return (false, "کاربر یافت نشد.");
+
+            user.UpdatedAt = DateTime.UtcNow;
+            await _unitOfWork.Users.UpdateAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            return (true, "پروفایل با موفقیت به‌روزرسانی شد.");
+        }
+        catch (Exception ex)
+        {
+            return (false, $"خطا در به‌روزرسانی پروفایل: {ex.Message}");
+        }
+    }
 }

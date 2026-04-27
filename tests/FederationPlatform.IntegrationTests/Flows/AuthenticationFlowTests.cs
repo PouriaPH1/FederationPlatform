@@ -14,11 +14,11 @@ namespace FederationPlatform.IntegrationTests.Flows
             // Arrange
             var registerDto = new CreateUserDto
             {
-                Username = \"testuser_integration\",
-                Email = \"testintegration@example.com\",
-                Password = \"SecurePassword123!\",
-                FirstName = \"Integration\",
-                LastName = \"Test\"
+                Username = "testuser_integration",
+                Email = "testintegration@example.com",
+                Password = "SecurePassword123!",
+                FirstName = "Integration",
+                LastName = "Test"
             };
 
             // Act - Register
@@ -47,7 +47,7 @@ namespace FederationPlatform.IntegrationTests.Flows
         public async Task PasswordResetFlow_UserCanResetPassword()
         {
             // Arrange
-            var user = await CreateTestUserAsync(\"resettest@example.com\", \"OldPassword123!\");
+            var user = await CreateTestUserAsync("resettest@example.com", "OldPassword123!");
             var oldEmail = user.Email;
 
             // Act - Request password reset
@@ -62,7 +62,7 @@ namespace FederationPlatform.IntegrationTests.Flows
             {
                 Email = oldEmail,
                 Token = resetToken,
-                NewPassword = \"NewPassword123!\"
+                NewPassword = "NewPassword123!"
             };
 
             var resetResult = await _authService.ResetPasswordAsync(resetDto);
@@ -74,7 +74,7 @@ namespace FederationPlatform.IntegrationTests.Flows
             var loginDto = new LoginDto
             {
                 Email = oldEmail,
-                Password = \"NewPassword123!\"
+                Password = "NewPassword123!"
             };
 
             var loginResult = await _authService.LoginAsync(loginDto);
@@ -85,7 +85,7 @@ namespace FederationPlatform.IntegrationTests.Flows
         public async Task RolePromotionFlow_RepresentativeCanBeCreated()
         {
             // Arrange
-            var user = await CreateTestUserAsync(\"promote@example.com\", \"Password123!\");
+            var user = await CreateTestUserAsync("promote@example.com", "Password123!");
             user.Role.Should().Be(UserRole.User);
 
             // Act - Promote to representative
@@ -103,7 +103,7 @@ namespace FederationPlatform.IntegrationTests.Flows
         public async Task UserBanFlow_AdminCanBanUser()
         {
             // Arrange
-            var user = await CreateTestUserAsync(\"bantest@example.com\", \"Password123!\");
+            var user = await CreateTestUserAsync("bantest@example.com", "Password123!");
             user.IsActive.Should().BeTrue();
 
             // Act - Ban user
@@ -120,7 +120,7 @@ namespace FederationPlatform.IntegrationTests.Flows
             var loginDto = new LoginDto
             {
                 Email = user.Email,
-                Password = \"Password123!\"
+                Password = "Password123!"
             };
 
             var loginResult = await _authService.LoginAsync(loginDto);
@@ -131,12 +131,12 @@ namespace FederationPlatform.IntegrationTests.Flows
         public async Task ConcurrentLoginAttempts_HandledCorrectly()
         {
             // Arrange
-            var user = await CreateTestUserAsync(\"concurrent@example.com\", \"Password123!\");
+            var user = await CreateTestUserAsync("concurrent@example.com", "Password123!");
 
             var loginDto = new LoginDto
             {
                 Email = user.Email,
-                Password = \"Password123!\"
+                Password = "Password123!"
             };
 
             // Act - Multiple concurrent login attempts
@@ -155,12 +155,12 @@ namespace FederationPlatform.IntegrationTests.Flows
         public async Task SessionTimeout_EnforcedCorrectly()
         {
             // Arrange
-            var user = await CreateTestUserAsync(\"session@example.com\", \"Password123!\");
+            var user = await CreateTestUserAsync("session@example.com", "Password123!");
 
             var loginDto = new LoginDto
             {
                 Email = user.Email,
-                Password = \"Password123!\"
+                Password = "Password123!"
             };
 
             var loginResult = await _authService.LoginAsync(loginDto);

@@ -26,11 +26,11 @@ namespace FederationPlatform.UnitTests.Services
             // Arrange
             var createDto = new CreateWorkshopDto
             {
-                Title = \"Leadership Workshop\",
-                Description = \"Learn leadership skills\",
+                Title = "Leadership Workshop",
+                Description = "Learn leadership skills",
                 StartDate = DateTime.UtcNow.AddDays(7),
                 EndDate = DateTime.UtcNow.AddDays(8),
-                Location = \"Tehran Hall\",
+                Location = "Tehran Hall",
                 CreatedBy = 1
             };
 
@@ -51,9 +51,9 @@ namespace FederationPlatform.UnitTests.Services
             var now = DateTime.UtcNow;
             var workshops = new List<Workshop>
             {
-                new Workshop { Id = 1, Title = \"Past Workshop\", StartDate = now.AddDays(-10) },
-                new Workshop { Id = 2, Title = \"Upcoming Workshop\", StartDate = now.AddDays(7) },
-                new Workshop { Id = 3, Title = \"Future Workshop\", StartDate = now.AddDays(30) }
+                new Workshop { Id = 1, Title = "Past Workshop", StartDate = now.AddDays(-10) },
+                new Workshop { Id = 2, Title = "Upcoming Workshop", StartDate = now.AddDays(7) },
+                new Workshop { Id = 3, Title = "Future Workshop", StartDate = now.AddDays(30) }
             };
 
             _mockWorkshopRepository.Setup(x => x.GetAllAsync())

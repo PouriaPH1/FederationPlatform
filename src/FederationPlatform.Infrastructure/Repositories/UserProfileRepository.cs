@@ -16,7 +16,7 @@ public class UserProfileRepository : RepositoryBase<UserProfile>, IUserProfileRe
         return await _dbSet.FirstOrDefaultAsync(up => up.UserId == userId);
     }
 
-    public async Task<IEnumerable<UserProfile>> GetAllAsync()
+    public override async Task<IEnumerable<UserProfile>> GetAllAsync()
     {
         return await _dbSet.ToListAsync();
     }

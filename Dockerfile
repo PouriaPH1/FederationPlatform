@@ -8,6 +8,8 @@ COPY ["src/FederationPlatform.Domain/FederationPlatform.Domain.csproj", "src/Fed
 COPY ["src/FederationPlatform.Application/FederationPlatform.Application.csproj", "src/FederationPlatform.Application/"]
 COPY ["src/FederationPlatform.Infrastructure/FederationPlatform.Infrastructure.csproj", "src/FederationPlatform.Infrastructure/"]
 COPY ["src/FederationPlatform.Web/FederationPlatform.Web.csproj", "src/FederationPlatform.Web/"]
+COPY ["tests/FederationPlatform.UnitTests/FederationPlatform.UnitTests.csproj", "tests/FederationPlatform.UnitTests/"]
+COPY ["tests/FederationPlatform.IntegrationTests/FederationPlatform.IntegrationTests.csproj", "tests/FederationPlatform.IntegrationTests/"]
 
 # Restore dependencies
 RUN dotnet restore "FederationPlatform.sln"

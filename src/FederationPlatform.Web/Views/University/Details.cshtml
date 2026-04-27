@@ -85,10 +85,10 @@
                     <div class="activity-card-mini">
                         <div class="activity-header">
                             <h5>@activity.Title</h5>
-                            <span class="status-badge @activity.Status.ToLower()">@activity.Status</span>
+                            <span class="status-badge @activity.Status.ToString().ToLower()">@activity.Status</span>
                         </div>
                         <p class="activity-date">
-                            <i class="fas fa-calendar me-2"></i>@activity.StartDate?.ToString("yyyy/MM/dd")
+                            <i class="fas fa-calendar me-2"></i>@activity.StartDate.ToString("yyyy/MM/dd")
                         </p>
                         <p class="activity-description">
                             @Html.Raw(activity.Description.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)
@@ -136,7 +136,7 @@
             {
                 <div class="col-lg-12 mb-3">
                     <div class="news-card-horizontal">
-                        <div class="news-date">@news.PublishDate?.ToString("yyyy/MM/dd")</div>
+                        <div class="news-date">@news.PublishDate.ToString("yyyy/MM/dd")</div>
                         <h5>@news.Title</h5>
                         <p>@Html.Raw(news.Content.Length > 200 ? news.Content.Substring(0, 200) + "..." : news.Content)</p>
                     </div>

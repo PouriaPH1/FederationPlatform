@@ -1,3 +1,4 @@
+@using FederationPlatform.Web.Models.ViewModels
 @model DashboardViewModel
 
 @{
@@ -11,15 +12,15 @@
     </div>
 
     <div class="container-fluid py-4">
-        @if (Model.AdminDashboard?.PendingActivities.Any() ?? false)
+        @if (Model.AdminDashboard?.PendingActivityList?.Any() ?? false)
         {
             <div class="pending-list">
-                @foreach (var activity in Model.AdminDashboard.PendingActivities)
+                @foreach (var activity in Model.AdminDashboard.PendingActivityList)
                 {
                     <div class="pending-card">
                         <div class="card-header">
                             <h4>@activity.Title</h4>
-                            <span class="submission-date">@activity.SubmitDate?.ToString("yyyy/MM/dd HH:mm")</span>
+                            <span class="submission-date">@activity.SubmitDate.ToString("yyyy/MM/dd HH:mm")</span>
                         </div>
 
                         <div class="card-body">
@@ -35,7 +36,7 @@
                                     </p>
                                     <p class="info-item">
                                         <strong><i class="fas fa-calendar me-2"></i>تاریخ:</strong>
-                                        @activity.StartDate?.ToString("yyyy/MM/dd HH:mm")
+                                        @activity.StartDate.ToString("yyyy/MM/dd HH:mm")
                                     </p>
                                 </div>
                                 <div class="col-md-6">
@@ -68,7 +69,7 @@
                                         {
                                             <li>
                                                 <i class="fas fa-file me-2"></i>
-                                                <a href="@file.Url" target="_blank">@file.Name</a>
+                                                <a href="@file.Url" target="_blank">@file.FileName</a>
                                             </li>
                                         }
                                     </ul>

@@ -44,7 +44,7 @@ public class AuthService : IAuthService
         var profile = new UserProfile
         {
             UserId = user.Id,
-            PhoneNumber = dto.PhoneNumber,
+            PhoneNumber = dto.PhoneNumber ?? string.Empty,
             UniversityId = dto.UniversityId,
             Major = dto.FieldOfStudy
         };

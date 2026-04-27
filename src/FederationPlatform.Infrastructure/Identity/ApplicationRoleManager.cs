@@ -5,7 +5,7 @@ namespace FederationPlatform.Infrastructure.Identity;
 
 public class ApplicationRoleManager : RoleManager<IdentityRole>
 {
-    public ApplicationRoleManager(IRoleStore<IdentityRole> store) : base(store, null, null, null, null)
+    public ApplicationRoleManager(IRoleStore<IdentityRole> store) : base(store, null!, null!, null!, null!)
     {
     }
 

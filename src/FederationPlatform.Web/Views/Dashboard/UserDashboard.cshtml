@@ -61,7 +61,7 @@
                         <i class="fas fa-list"></i>
                         <span>مشاهده فعالیت‌ها</span>
                     </a>
-                    @if (!string.IsNullOrEmpty(@Model.UserDashboard?.UserRole) && @Model.UserDashboard?.UserRole.Contains("Representative"))
+                    @if (!string.IsNullOrEmpty(@Model.UserDashboard?.UserRole) && @Model.UserDashboard.UserRole.Contains("Representative"))
                     {
                         <a href="@Url.Action("Create", "Activity")" class="action-btn">
                             <i class="fas fa-plus"></i>
@@ -91,13 +91,13 @@
                     @foreach (var activity in Model.UserDashboard.MyActivities.Take(5))
                     {
                         <div class="activity-item">
-                            <div class="activity-status-badge @activity.Status.ToLower()">
+                            <div class="activity-status-badge @activity.Status.ToString().ToLower()">
                                 @activity.Status
                             </div>
                             <div class="activity-info">
                                 <h5>@activity.Title</h5>
                                 <p class="text-muted">
-                                    <i class="fas fa-calendar me-2"></i>@activity.StartDate?.ToString("yyyy/MM/dd")
+                                    <i class="fas fa-calendar me-2"></i>@activity.StartDate.ToString("yyyy/MM/dd")
                                 </p>
                             </div>
                             <a href="@Url.Action("Details", "Activity", new { id = activity.Id })" class="btn btn-sm btn-outline-primary">
@@ -120,7 +120,7 @@
                     @foreach (var activity in Model.UserDashboard.JoinedActivities.Take(5))
                     {
                         <div class="activity-item">
-                            <div class="activity-status-badge @activity.Status.ToLower()">
+                            <div class="activity-status-badge @activity.Status.ToString().ToLower()">
                                 @activity.Status
                             </div>
                             <div class="activity-info">
@@ -327,8 +327,10 @@
 .activity-info p {
     margin: 0.5rem 0 0;
 }
+</style>
 
-@media (max-width: 768px) {
+<style>
+@@media (max-width: 768px) {
     .activity-item {
         flex-direction: column;
         align-items: flex-start;
@@ -338,4 +340,5 @@
         grid-template-columns: repeat(2, 1fr);
     }
 }
+</style>
 </style>

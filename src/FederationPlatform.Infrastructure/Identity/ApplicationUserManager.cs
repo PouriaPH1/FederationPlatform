@@ -6,7 +6,7 @@ namespace FederationPlatform.Infrastructure.Identity;
 
 public class ApplicationUserManager : UserManager<User>
 {
-    public ApplicationUserManager(IUserStore<User> store) : base(store, null, new PasswordHasher<User>(), null, null, null, null, null, null)
+    public ApplicationUserManager(IUserStore<User> store) : base(store, null!, new PasswordHasher<User>(), null!, null!, null!, null!, null!, null!)
     {
     }
 

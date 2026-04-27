@@ -10,8 +10,8 @@ public class DbInitializer
     {
         try
         {
-            // Create database if it doesn't exist
-            await context.Database.MigrateAsync();
+            // Create database if it doesn't exist (without migrations)
+            await context.Database.EnsureCreatedAsync();
 
             // Check if database already has data
             if (await context.Universities.AnyAsync())

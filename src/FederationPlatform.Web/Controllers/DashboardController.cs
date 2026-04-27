@@ -1,3 +1,4 @@
+using FederationPlatform.Application.DTOs;
 using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
 using FederationPlatform.Web.Models.ViewModels;
@@ -53,34 +54,31 @@ public class DashboardController : Controller
     {
         try
         {
-            var user = await _userService.GetUserByIdAsync(userId);
-            var activities = await _activityService.GetUserActivitiesAsync(userId);
-            var joinedActivities = await _activityService.GetUserJoinedActivitiesAsync(userId);
+            if (!int.TryParse(userId, out var userIdInt))
+                return Unauthorized();
+
+            var user = await _userService.GetUserByIdAsync(userIdInt);
+            var activities = await _activityService.GetUserActivitiesAsync(userIdInt);
 
             var model = new DashboardViewModel
             {
                 UserName = user?.FirstName + " " + user?.LastName ?? "کاربر",
                 UserDashboard = new UserDashboardViewModel
                 {
-                    MyActivitiesCount = activities?.Count(a => a.RepresentativeId == userId) ?? 0,
+                    MyActivitiesCount = activities?.Count(a => a.RepresentativeId == userIdInt) ?? 0,
                     ApprovedActivitiesCount = activities?.Count(a => a.IsApproved) ?? 0,
                     PendingActivitiesCount = activities?.Count(a => !a.IsApproved) ?? 0,
-                    JoinedActivitiesCount = joinedActivities?.Count() ?? 0,
+                    JoinedActivitiesCount = 0,
                     UserRole = "User",
                     MyActivities = activities?.Take(5).Select(a => new ActivityBriefViewModel
                     {
                         Id = a.Id,
                         Title = a.Title,
-                        Status = a.IsApproved ? "تایید شده" : "در انتظار",
-                        StartDate = a.StartDate
-                    }).ToList() ?? new List<ActivityBriefViewModel>(),
-                    JoinedActivities = joinedActivities?.Take(5).Select(a => new ActivityBriefViewModel
-                    {
-                        Id = a.Id,
-                        Title = a.Title,
-                        Status = a.IsApproved ? "تایید شده" : "در انتظار",
+                        Status = a.Status,
                         StartDate = a.StartDate,
-                        UniversityName = a.University?.Name ?? ""
+                        Location = a.Location,
+                        UniversityName = a.UniversityName,
+                        Description = a.Description
                     }).ToList() ?? new List<ActivityBriefViewModel>()
                 }
             };
@@ -98,8 +96,11 @@ public class DashboardController : Controller
     {
         try
         {
-            var user = await _userService.GetUserByIdAsync(userId);
-            var activities = await _activityService.GetUserActivitiesAsync(userId);
+            if (!int.TryParse(userId, out var userIdInt))
+                return Unauthorized();
+
+            var user = await _userService.GetUserByIdAsync(userIdInt);
+            var activities = await _activityService.GetUserActivitiesAsync(userIdInt);
 
             var model = new DashboardViewModel
             {
@@ -115,8 +116,11 @@ public class DashboardController : Controller
                     {
                         Id = a.Id,
                         Title = a.Title,
-                        Status = a.IsApproved ? "تایید شده" : "در انتظار",
-                        StartDate = a.StartDate
+                        Status = a.Status,
+                        StartDate = a.StartDate,
+                        Location = a.Location,
+                        UniversityName = a.UniversityName,
+                        Description = a.Description
                     }).ToList() ?? new List<ActivityBriefViewModel>()
                 }
             };
@@ -149,29 +153,30 @@ public class DashboardController : Controller
                     TotalActivities = totalActivities,
                     TotalUniversities = 25, // From seed data
                     PendingActivitiesCount = pendingActivities?.Count() ?? 0,
-                    PendingActivities = pendingActivities?.Take(5).Select(a => new PendingActivityViewModel
+                    PendingActivityList = pendingActivities?.Take(5).Select(a => new PendingActivityViewModel
                     {
                         Id = a.Id,
                         Title = a.Title,
                         Description = a.Description,
-                        UniversityName = a.University?.Name ?? "",
-                        RepresentativeName = a.Representative?.UserName ?? "",
+                        UniversityName = a.University ?? "",
+                        RepresentativeName = a.Representative ?? "",
                         SubmitDate = a.CreatedAt,
                         StartDate = a.StartDate,
                         Location = a.Location,
-                        ExpectedParticipants = a.ParticipantCount,
+                        ExpectedParticipants = a.ParticipantCount ?? 0,
                         Category = a.Category,
-                        Files = a.Files?.Select(f => new FileDto
+                        Files = a.Files?.Select(f => new ActivityFileViewModel
                         {
                             Id = f.Id,
-                            Name = f.FileName,
+                            FileName = f.FileName,
                             Url = f.FilePath
-                        }).ToList() ?? new List<FileDto>()
+                        }).ToList() ?? new List<ActivityFileViewModel>()
                     }).ToList() ?? new List<PendingActivityViewModel>(),
                     RecentUsers = recentUsers?.Select(u => new UserAdminViewModel
                     {
                         Id = u.Id,
-                        FullName = u.FirstName + " " + u.LastName,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
                         Email = u.Email,
                         UniversityName = u.UniversityId > 0 ? "دانشگاه" : "نامشخص",
                         RegisterDate = u.CreatedAt

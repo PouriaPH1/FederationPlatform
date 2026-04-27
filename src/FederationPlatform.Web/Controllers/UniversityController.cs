@@ -1,5 +1,7 @@
+using FederationPlatform.Application.DTOs;
 using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
+using FederationPlatform.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FederationPlatform.Web.Controllers;
@@ -103,9 +105,10 @@ public class UniversityController : Controller
                     Id = a.Id,
                     Title = a.Title,
                     Description = a.Description,
-                    Status = a.IsApproved ? "تایید شده" : "در انتظار",
+                    Status = a.Status,
                     StartDate = a.StartDate,
-                    Location = a.Location
+                    Location = a.Location,
+                    UniversityName = a.UniversityName
                 }).ToList() ?? new List<ActivityBriefViewModel>(),
                 Representatives = university.Representatives?.Select(r => new UserBriefViewModel
                 {

@@ -7,7 +7,7 @@
 <div class="page-header">
     <div class="header-content">
         <h1>@Model.Title</h1>
-        <span class="status-badge @Model.Status.ToLower()">@Model.Status</span>
+        <span class="status-badge @Model.Status.ToString().ToLower()">@Model.Status</span>
     </div>
 </div>
 
@@ -29,11 +29,11 @@
                     </div>
                     <div class="info-row">
                         <span class="label"><i class="fas fa-calendar me-2"></i>شروع:</span>
-                        <span class="value">@Model.StartDate?.ToString("yyyy/MM/dd HH:mm")</span>
+                        <span class="value">@Model.StartDate.ToString("yyyy/MM/dd HH:mm")</span>
                     </div>
                     <div class="info-row">
                         <span class="label"><i class="fas fa-hourglass-end me-2"></i>پایان:</span>
-                        <span class="value">@Model.EndDate?.ToString("yyyy/MM/dd HH:mm")</span>
+                        <span class="value">@Model.EndDate.ToString("yyyy/MM/dd HH:mm")</span>
                     </div>
                     <div class="info-row">
                         <span class="label"><i class="fas fa-map-marker-alt me-2"></i>مکان:</span>
@@ -305,8 +305,10 @@
 .timeline-content p {
     margin: 0.5rem 0 0;
 }
+</style>
 
-@media (max-width: 768px) {
+<style>
+@@media (max-width: 768px) {
     .header-content {
         flex-direction: column;
         align-items: flex-start;

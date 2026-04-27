@@ -87,18 +87,18 @@
     </div>
 
     <!-- Pending Activities Section -->
-    @if (Model.AdminDashboard?.PendingActivities.Any() ?? false)
+    @if (Model.AdminDashboard?.PendingActivityList?.Any() ?? false)
     {
         <div class="row mb-4">
             <div class="col-lg-12">
                 <h3 class="section-title">فعالیت‌های در انتظار تایید</h3>
                 <div class="pending-activities">
-                    @foreach (var activity in Model.AdminDashboard.PendingActivities.Take(5))
+                    @foreach (var activity in Model.AdminDashboard.PendingActivityList.Take(5))
                     {
                         <div class="activity-item-admin">
                             <div class="activity-header-admin">
                                 <h5>@activity.Title</h5>
-                                <span class="date">@activity.SubmitDate?.ToString("yyyy/MM/dd")</span>
+                                <span class="date">@activity.CreatedAt.ToString("yyyy/MM/dd")</span>
                             </div>
                             <p class="text-muted small">
                                 <i class="fas fa-university me-2"></i>@activity.UniversityName
@@ -172,7 +172,7 @@
                                     <td>@user.FullName</td>
                                     <td>@user.Email</td>
                                     <td>@user.UniversityName</td>
-                                    <td>@user.RegisterDate?.ToString("yyyy/MM/dd")</td>
+                                    <td>@user.RegisterDate.ToString("yyyy/MM/dd")</td>
                                     <td>
                                         <a href="@Url.Action("UserDetails", "Admin", new { id = user.Id })" class="btn btn-sm btn-outline-primary">
                                             جزئیات
@@ -419,8 +419,10 @@
 .table tbody tr:hover {
     background: #F9FAFB;
 }
+</style>
 
-@media (max-width: 768px) {
+<style>
+@@media (max-width: 768px) {
     .actions-grid {
         grid-template-columns: repeat(2, 1fr);
     }

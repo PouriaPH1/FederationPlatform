@@ -6,6 +6,7 @@ public class UserDto
 {
     public int Id { get; set; }
     public string Username { get; set; } = string.Empty;
+    public string UserName => Username;
     public string Email { get; set; } = string.Empty;
     public UserRole Role { get; set; }
     public bool IsActive { get; set; }
@@ -15,6 +16,7 @@ public class UserDto
     public string? FullName { get; set; }
     public int? UniversityId { get; set; }
     public string? UniversityName { get; set; }
+    public UserProfileDto? UserProfile { get; set; }
 }
 
 public class CreateUserDto

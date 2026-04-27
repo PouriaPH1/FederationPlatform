@@ -109,7 +109,7 @@
                         <div class="news-card">
                             <div class="news-header">
                                 <h5>@news.Title</h5>
-                                <span class="date-badge">@news.PublishDate?.ToString("yyyy/MM/dd")</span>
+                                <span class="date-badge">@news.PublishDate.ToString("yyyy/MM/dd")</span>
                             </div>
                             <p>@Html.Raw(news.Content.Length > 150 ? news.Content.Substring(0, 150) + "..." : news.Content)</p>
                             <a href="#" class="btn btn-sm btn-text">ادامه مطلب</a>
@@ -130,11 +130,11 @@
                         <div class="col-md-4 mb-4">
                             <div class="activity-card">
                                 <div class="activity-status">
-                                    <span class="status-badge @activity.Status.ToLower()">@activity.Status</span>
+                                    <span class="status-badge @activity.Status.ToString().ToLower()">@activity.Status</span>
                                 </div>
                                 <h5>@activity.Title</h5>
                                 <p class="small text-muted">
-                                    <i class="fas fa-calendar me-1"></i>@activity.StartDate?.ToString("yyyy/MM/dd")
+                                    <i class="fas fa-calendar me-1"></i>@activity.StartDate.ToString("yyyy/MM/dd")
                                 </p>
                                 <p>@Html.Raw(activity.Description.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)</p>
                                 <a href="@Url.Action("Details", "Activity", new { id = activity.Id })" class="btn btn-sm btn-primary">

@@ -1,4 +1,5 @@
 @* Breadcrumbs Navigation - Partial View *@
+@model List<BreadcrumbItem>
 
 @if (Model?.Count > 0)
 {
@@ -30,13 +31,4 @@
             }
         </ol>
     </nav>
-}
-
-@{
-    public class BreadcrumbItem
-    {
-        public string Title { get; set; }
-        public string Url { get; set; }
-        public string Icon { get; set; }
-    }
 }

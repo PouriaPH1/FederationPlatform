@@ -1,3 +1,4 @@
+using FederationPlatform.Application.DTOs;
 using FederationPlatform.Application.Services;
 using FederationPlatform.Web.Models;
 using FederationPlatform.Web.Models.ViewModels;
@@ -41,24 +42,20 @@ public class ActivityController : Controller
     {
         try
         {
-            var pageSize = 12;
-            var activities = await _activityService.GetApprovedActivitiesAsync(page, pageSize, searchTerm);
+            var activities = await _activityService.GetApprovedActivitiesAsync();
 
             var model = new ActivityListViewModel
             {
-                Activities = activities?.Items?.Select(a => new ActivityCardViewModel
+                Activities = activities?.Select(a => new ActivityDetailViewModel
                 {
                     Id = a.Id,
                     Title = a.Title,
                     Description = a.Description,
-                    Status = a.IsApproved ? "تایید شده" : "در انتظار",
-                    UniversityName = a.University?.Name ?? "نامشخص",
                     StartDate = a.StartDate,
-                    ParticipantsCount = a.ParticipantCount,
-                    RepresentativeName = a.Representative?.UserName ?? ""
-                }).ToList() ?? new List<ActivityCardViewModel>(),
+                    IsApproved = a.IsApproved
+                }).ToList() ?? new List<ActivityDetailViewModel>(),
                 CurrentPage = page,
-                TotalPages = (activities?.TotalCount ?? 0 + pageSize - 1) / pageSize,
+                TotalPages = 1,
                 SearchTerm = searchTerm ?? ""
             };
 
@@ -87,8 +84,8 @@ public class ActivityController : Controller
                 Location = activity.Location,
                 StartDate = activity.StartDate,
                 EndDate = activity.EndDate,
-                UniversityName = activity.University?.Name ?? "",
-                RepresentativeName = activity.Representative?.UserName ?? "",
+                UniversityName = activity.UniversityName ?? "",
+                RepresentativeName = activity.Representative ?? "",
                 ParticipantsCount = activity.ParticipantCount,
                 IsApproved = activity.IsApproved,
                 Files = activity.Files?.Select(f => new ActivityFileViewModel
@@ -156,7 +153,7 @@ public class ActivityController : Controller
                 EndDate = model.EndDate,
                 UniversityId = model.UniversityId,
                 Category = model.Category,
-                ExpectedParticipants = model.ExpectedParticipants,
+                ExpectedParticipants = model.ExpectedParticipants ?? 0,
                 Budget = model.Budget ?? 0
             };
 
@@ -165,10 +162,8 @@ public class ActivityController : Controller
 
             var result = await _activityService.CreateActivityAsync(userIdInt, createDto);
             
-            if (!result.Succeeded)
-                return BadRequest(result.Messages?.FirstOrDefault() ?? "خطا در ایجاد فعالیت");
-
-            var activityId = int.Parse(result.Data?.ToString() ?? "0");
+            if (result == null || result.Id == 0)
+                return BadRequest("خطا در ایجاد فعالیت");
 
             // Handle file uploads
             if (model.Files?.Any() ?? false)
@@ -177,7 +172,7 @@ public class ActivityController : Controller
                 {
                     if (file.Length > 0)
                     {
-                        var uploadResult = await _fileService.UploadFileAsync(file, $"activities/{activityId}");
+                        var uploadResult = await _fileService.UploadFileAsync(file, $"activities/{result.Id}");
                         if (string.IsNullOrEmpty(uploadResult))
                             _logger.LogWarning("Failed to upload file: {FileName}", file.FileName);
                     }
@@ -185,14 +180,14 @@ public class ActivityController : Controller
             }
 
             // Send notifications to all admins
-            var activity = await _activityService.GetActivityByIdAsync(activityId);
+            var activity = await _activityService.GetActivityByIdAsync(result.Id);
             if (activity != null)
             {
-                var currentUser = await _userService.GetUserByIdAsync(int.Parse(userId));
+                var currentUser = await _userService.GetUserByIdAsync(userIdInt);
                 var representativeName = currentUser?.Username ?? "نماینده";
 
                 await _notificationService.SendNewActivityNotificationToAdminAsync(
-                    activityId, activity.Title, representativeName);
+                    result.Id, activity.Title, representativeName);
 
                 // Send email to admins
                 var admins = await _userService.GetAdminUsersAsync();
@@ -203,8 +198,8 @@ public class ActivityController : Controller
                 }
             }
 
-            _logger.LogInformation("Activity {ActivityId} created successfully", activityId);
-            return RedirectToAction("Details", new { id = activityId, message = "فعالیت با موفقیت ایجاد شد" });
+            _logger.LogInformation("Activity {ActivityId} created successfully", result.Id);
+            return RedirectToAction("Details", new { id = result.Id, message = "فعالیت با موفقیت ایجاد شد" });
         }
         catch (Exception ex)
         {
@@ -232,10 +227,10 @@ public class ActivityController : Controller
                     Id = a.Id,
                     Title = a.Title,
                     Description = a.Description,
-                    Status = a.IsApproved ? "تایید شده" : "در انتظار",
-                    UniversityName = a.University?.Name ?? "",
+                    Status = a.StatusName,
+                    UniversityName = a.UniversityName ?? "",
                     StartDate = a.StartDate,
-                    ParticipantsCount = a.ParticipantCount
+                    ParticipantsCount = a.ParticipantCount ?? 0
                 }).ToList() ?? new List<ActivityCardViewModel>()
             };
 

@@ -29,8 +29,7 @@ namespace FederationPlatform.IntegrationTests.Data
         public async Task CascadingDelete_ActivityFiles()
         {
             // Arrange
-            var representative = await CreateTestRepresentativeAsync(\"cascade@example.com\");
-            var activity = await CreateTestActivityAsync(representati"cascade@example.com");
+            var representative = await CreateTestRepresentativeAsync("cascade@example.com");
             var activity = await CreateTestActivityAsync(representative.Id);
 
             // Act - Delete activity
@@ -38,19 +37,14 @@ namespace FederationPlatform.IntegrationTests.Data
 
             // Assert - Activity should be deleted
             var deletedActivity = await _activityService.GetActivityByIdAsync(activity.Id);
-            deletedActivity.Should().BeNull
+            deletedActivity.Should().BeNull();
+        }
 
         [Fact]
         public async Task UniqueConstraint_UserEmail()
         {
             // Arrange
-            var email = \"unique@example.com\";
-            var user1 = new CreateUserDto
-            {
-                Username = \"user1\",
-                Email = email,
-                Password = \"Password123!\"
-            };"unique@example.com";
+            var email = "unique@example.com";
             var user1 = new CreateUserDto
             {
                 Username = "user1",
@@ -72,13 +66,6 @@ namespace FederationPlatform.IntegrationTests.Data
 
             // Assert
             await act.Should().ThrowAsync<Exception>();
-            var countBefore = (await _universityService.GetAllUniversitiesAsync()).Count();
-
-            // Act - Count after should match before
-            var countAfter = (await _universityService.GetAllUniversitiesAsync()).Count();
-
-            // Assert - Count should not change
-            countAfter.Should().Be(countBefore);
         }
 
         [Fact]
@@ -86,7 +73,7 @@ namespace FederationPlatform.IntegrationTests.Data
         {
             // Arrange
             var university = await CreateTestUniversityAsync();
-            var updateDto = new UpdateUniversityDto { Description = \"Updated\" };
+            var updateDto = new UpdateUniversityDto { Description = "Updated" };
 
             // Act - Concurrent updates
             var tasks = Enumerable.Range(0, 5)
@@ -95,38 +82,31 @@ namespace FederationPlatform.IntegrationTests.Data
 
             var results = await Task.WhenAll(tasks);
 
-            // Act - Get university multiple times
-            var tasks = Enumerable.Range(0, 5)
-                .Select(_ => _universityService.GetUniversityByIdAsync(university.Id))
-                .ToArray();
+            // Assert
+            results.Should().AllSatisfy(r => r.Success.Should().BeTrue());
+        }
 
-            var results = await Task.WhenAll(tasks);
+        [Fact]
+        public async Task SessionConsistency_Ensured()
+        {
+            // Arrange
+            var user = await CreateTestUserAsync("consistent@example.com", "Password123!");
+
+            // Act - Create activity
+            var activity = await CreateTestActivityAsync(user.Id);
 
             // Assert
-            results.Should().AllSatisfy(r => r.Should().NotBeNull
-            // Act - Create profile
-            var profileDto = new UpdateUserProfileDto
-            {
-                FirstName = \"Test\",
-                LastName = \"User\",
-                UniversityId = 1,
-                PhoneNumber = \"09123456789\"
-            };"profile@example.com", "Password123!");
+            activity.UserId.Should().Be(user.Id);
+            activity.Should().NotBeNull();
+        }
 
-            // Act - Create profile
-            var profileDto = new UpdateUserProfileDto
-            {
-                FirstName = "Test",
-                LastName = "User",
-                UniversityId = 1,
-                PhoneNumber = "09123456789"
-            };
+        [Fact]
+        public async Task InvalidStatusTransition_ThrowsException()
+        {
+            // Arrange
+            var representative = await CreateTestRepresentativeAsync("orphan@example.com", "Password123!");
+            var activity = await CreateTestActivityAsync(representative.Id);
 
-            var result = await _userProfileService.UpdateProfileAsync(user.Id, profileDto);
-
-            // Assert
-            result.Success.Should().BeTrue();
-            user
             // Act - Invalid status transition
             Func<Task> act = async () => 
             {
@@ -136,22 +116,20 @@ namespace FederationPlatform.IntegrationTests.Data
             };
 
             // Assert
-            await act.Should().ThrowAsync<ArgumentException>();"consistent@example.com");
-            var activity = await CreateTestActivityAsync(representative.Id);
+            await act.Should().ThrowAsync<ArgumentException>();
+        }
 
-            // Assert
-            activity.Status.Should().Be(ActivityStatus.Pending
+        [Fact]
+        public async Task PreventOrphanedData_OnUserDeletion()
+        {
+            // Arrange
+            var user = await CreateTestUserAsync("orphan@example.com", "Password123!");
+
+            // Act - Attempt to delete user
             Func<Task> act = async () => await _userService.DeleteUserAsync(user.Id);
 
             // Assert - Should prevent deletion or cascade
             await act.Should().ThrowAsync<InvalidOperationException>();
         }
     }
-}"orphan@example.com", "Password123!");
-
-            // Act - Create activity
-            var activity = await CreateTestActivityAsync(user.Id);
-
-            // Assert
-            activity.UserId.Should().Be(user.Id);
-            activity.Should().NotBeNull
+}

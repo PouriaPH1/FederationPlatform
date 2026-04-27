@@ -66,7 +66,7 @@ public class FileService : IFileService
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", filePath);
             if (File.Exists(fullPath))
             {
-                File.Delete(fullPath);
+                await Task.Run(() => File.Delete(fullPath));
                 return (true, null);
             }
             return (false, "فایل یافت نشد.");
