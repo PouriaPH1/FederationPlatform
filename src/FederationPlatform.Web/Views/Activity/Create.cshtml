@@ -34,7 +34,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group mb-3">
                                 <label class="form-label" asp-for="UniversityId">
                                     <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.UniversityId)
@@ -45,24 +45,43 @@
                                 <span class="form-text text-muted" asp-validation-for="UniversityId"></span>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group mb-3">
-                                <label class="form-label">
-                                    <span class="required-badge">*</span>نوع فعالیت
+                                <label class="form-label" asp-for="OrganizationId">
+                                    <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.OrganizationId)
                                 </label>
-                                <select class="form-select" asp-for="Category" required>
-                                    <option value="">-- انتخاب نوع --</option>
-                                    <option value="Workshop">کارگاه</option>
-                                    <option value="Seminar">سمینار</option>
-                                    <option value="Conference">کنفرانس</option>
-                                    <option value="Training">آموزش</option>
-                                    <option value="Competition">مسابقه</option>
-                                    <option value="Meeting">جلسه</option>
-                                    <option value="Other">دیگر</option>
+                                <select class="form-select" asp-for="OrganizationId" asp-items="@(Model.Organizations ?? new List<SelectListItem>())" required>
+                                    <option value="">-- انتخاب تشکل --</option>
                                 </select>
-                                <span class="form-text text-muted" asp-validation-for="Category"></span>
+                                <span class="form-text text-muted" asp-validation-for="OrganizationId"></span>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label class="form-label" asp-for="ActivityType">
+                                    <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.ActivityType)
+                                </label>
+                                <select class="form-select" asp-for="ActivityType" required>
+                                    <option value="">-- انتخاب نوع فعالیت --</option>
+                                    <option value="0">رویداد</option>
+                                    <option value="1">کارگاه</option>
+                                    <option value="2">جلسه</option>
+                                    <option value="3">پروژه</option>
+                                    <option value="4">مسابقه</option>
+                                    <option value="5">رسانه</option>
+                                    <option value="6">سایر</option>
+                                </select>
+                                <span class="form-text text-muted" asp-validation-for="ActivityType"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label class="form-label" asp-for="Category">
+                            @Html.DisplayNameFor(m => m.Category)
+                        </label>
+                        <input type="text" class="form-control" asp-for="Category" maxlength="100" placeholder="مثلاً آموزشی، فرهنگی، پژوهشی">
+                        <span class="form-text text-muted" asp-validation-for="Category"></span>
                     </div>
                 </div>
 

@@ -14,6 +14,7 @@ public class ActivityController : Controller
 {
     private readonly IActivityService _activityService;
     private readonly IUniversityService _universityService;
+    private readonly IOrganizationService _organizationService;
     private readonly IFileService _fileService;
     private readonly INotificationService _notificationService;
     private readonly IEmailService _emailService;
@@ -23,6 +24,7 @@ public class ActivityController : Controller
     public ActivityController(
         IActivityService activityService,
         IUniversityService universityService,
+        IOrganizationService organizationService,
         IFileService fileService,
         INotificationService notificationService,
         IEmailService emailService,
@@ -31,6 +33,7 @@ public class ActivityController : Controller
     {
         _activityService = activityService;
         _universityService = universityService;
+        _organizationService = organizationService;
         _fileService = fileService;
         _notificationService = notificationService;
         _emailService = emailService;
@@ -112,6 +115,7 @@ public class ActivityController : Controller
         try
         {
             var universities = await _universityService.GetAllUniversitiesAsync();
+            var organizations = await _organizationService.GetAllOrganizationsAsync();
             
             var model = new CreateActivityViewModel
             {
@@ -119,6 +123,11 @@ public class ActivityController : Controller
                 {
                     Value = u.Id.ToString(),
                     Text = u.Name
+                }).ToList() ?? new List<SelectListItem>(),
+                Organizations = organizations?.Select(o => new SelectListItem
+                {
+                    Value = o.Id.ToString(),
+                    Text = o.Name
                 }).ToList() ?? new List<SelectListItem>()
             };
 
@@ -139,10 +148,16 @@ public class ActivityController : Controller
         {
             // Repopulate Universities and Organizations for the view when validation fails
             var universities = await _universityService.GetAllUniversitiesAsync();
+            var organizations = await _organizationService.GetAllOrganizationsAsync();
             model.Universities = universities?.Select(u => new SelectListItem
             {
                 Value = u.Id.ToString(),
                 Text = u.Name
+            }).ToList() ?? new List<SelectListItem>();
+            model.Organizations = organizations?.Select(o => new SelectListItem
+            {
+                Value = o.Id.ToString(),
+                Text = o.Name
             }).ToList() ?? new List<SelectListItem>();
 
             return View(model);
@@ -161,7 +176,9 @@ public class ActivityController : Controller
                 Location = model.Location,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
+                ActivityType = model.ActivityType,
                 UniversityId = model.UniversityId,
+                OrganizationId = model.OrganizationId,
                 Category = model.Category,
                 ExpectedParticipants = model.ExpectedParticipants ?? 0,
                 Budget = model.Budget ?? 0
@@ -189,27 +206,42 @@ public class ActivityController : Controller
                 }
             }
 
-            // Send notifications to all admins
+            // Send notifications to all admins (best-effort: do not fail activity creation)
             var activity = await _activityService.GetActivityByIdAsync(result.Id);
             if (activity != null)
             {
                 var currentUser = await _userService.GetUserByIdAsync(userIdInt);
                 var representativeName = currentUser?.Username ?? "نماینده";
 
-                await _notificationService.SendNewActivityNotificationToAdminAsync(
-                    result.Id, activity.Title, representativeName);
+                try
+                {
+                    await _notificationService.SendNewActivityNotificationToAdminAsync(
+                        result.Id, activity.Title, representativeName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to create admin notification for activity {ActivityId}", result.Id);
+                }
 
-                // Send email to admins
+                // Email is optional in some environments; failures are logged and ignored.
                 var admins = await _userService.GetAdminUsersAsync();
                 foreach (var admin in admins)
                 {
-                    await _emailService.SendNewActivityNotificationEmailAsync(
-                        admin.Email, admin.Username, activity.Title, representativeName);
+                    try
+                    {
+                        await _emailService.SendNewActivityNotificationEmailAsync(
+                            admin.Email, admin.Username, activity.Title, representativeName);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to send activity email to admin {AdminEmail}", admin.Email);
+                    }
                 }
             }
 
             _logger.LogInformation("Activity {ActivityId} created successfully", result.Id);
-            return RedirectToAction("Details", new { id = result.Id, message = "فعالیت با موفقیت ایجاد شد" });
+            TempData["SuccessMessage"] = "فعالیت با موفقیت ایجاد شد.";
+            return RedirectToAction("Details", new { id = result.Id });
         }
         catch (Exception ex)
         {

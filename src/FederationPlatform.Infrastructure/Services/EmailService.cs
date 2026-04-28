@@ -8,8 +8,8 @@ namespace FederationPlatform.Infrastructure.Services;
 
 public class EmailService : IEmailService
 {
-    private readonly IConfiguration _configuration;
     private readonly ILogger<EmailService> _logger;
+    private readonly bool _enabled;
     private readonly string _smtpHost;
     private readonly int _smtpPort;
     private readonly string _smtpUsername;
@@ -20,20 +20,26 @@ public class EmailService : IEmailService
 
     public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
     {
-        _configuration = configuration;
         _logger = logger;
 
-        _smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
-        _smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
-        _smtpUsername = _configuration["Email:SmtpUsername"] ?? "";
-        _smtpPassword = _configuration["Email:SmtpPassword"] ?? "";
-        _fromEmail = _configuration["Email:FromEmail"] ?? "noreply@federation.ir";
-        _fromName = _configuration["Email:FromName"] ?? "فدراسیون اقتصاد سلامت";
-        _enableSsl = bool.Parse(_configuration["Email:EnableSsl"] ?? "true");
+        _enabled = bool.TryParse(configuration["Email:Enabled"], out var enabled) ? enabled : true;
+        _smtpHost = configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
+        _smtpPort = int.TryParse(configuration["Email:SmtpPort"], out var smtpPort) ? smtpPort : 587;
+        _smtpUsername = configuration["Email:SmtpUsername"] ?? "";
+        _smtpPassword = configuration["Email:SmtpPassword"] ?? "";
+        _fromEmail = configuration["Email:FromEmail"] ?? "noreply@federation.ir";
+        _fromName = configuration["Email:FromName"] ?? "فدراسیون اقتصاد سلامت";
+        _enableSsl = bool.TryParse(configuration["Email:EnableSsl"], out var enableSsl) ? enableSsl : true;
     }
 
     public async Task SendEmailAsync(string to, string subject, string body, bool isHtml = true)
     {
+        if (!_enabled)
+        {
+            _logger.LogInformation("Email sending is disabled by configuration. Skipping email to {Email}.", to);
+            return;
+        }
+
         try
         {
             using var client = new SmtpClient(_smtpHost, _smtpPort)
