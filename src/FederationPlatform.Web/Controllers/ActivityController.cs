@@ -136,7 +136,17 @@ public class ActivityController : Controller
     public async Task<IActionResult> Create(CreateActivityViewModel model)
     {
         if (!ModelState.IsValid)
+        {
+            // Repopulate Universities and Organizations for the view when validation fails
+            var universities = await _universityService.GetAllUniversitiesAsync();
+            model.Universities = universities?.Select(u => new SelectListItem
+            {
+                Value = u.Id.ToString(),
+                Text = u.Name
+            }).ToList() ?? new List<SelectListItem>();
+
             return View(model);
+        }
 
         try
         {

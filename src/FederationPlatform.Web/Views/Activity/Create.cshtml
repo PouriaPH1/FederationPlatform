@@ -39,7 +39,7 @@
                                 <label class="form-label" asp-for="UniversityId">
                                     <span class="required-badge">*</span>@Html.DisplayNameFor(m => m.UniversityId)
                                 </label>
-                                <select class="form-select" asp-for="UniversityId" asp-items="@(new SelectList(Model.Universities, "Id", "Name"))" required>
+                                <select class="form-select" asp-for="UniversityId" asp-items="@(Model.Universities ?? new List<SelectListItem>())" required>
                                     <option value="">-- انتخاب دانشگاه --</option>
                                 </select>
                                 <span class="form-text text-muted" asp-validation-for="UniversityId"></span>
