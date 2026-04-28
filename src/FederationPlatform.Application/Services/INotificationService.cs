@@ -15,4 +15,7 @@ public interface INotificationService
     Task SendActivityApprovalNotificationAsync(int userId, int activityId, string activityTitle);
     Task SendActivityRejectionNotificationAsync(int userId, int activityId, string activityTitle);
     Task SendNewActivityNotificationToAdminAsync(int activityId, string activityTitle, string representativeName);
+    Task SendUserBannedNotificationAsync(int userId, string reason);
+    Task SendUserActivatedNotificationAsync(int userId, string message);
+    Task SendUserPromotedNotificationAsync(int userId, string title, string message);
 }

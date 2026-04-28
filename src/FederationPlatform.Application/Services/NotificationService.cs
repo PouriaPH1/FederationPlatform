@@ -136,4 +136,43 @@ public class NotificationService : INotificationService
             await CreateNotificationAsync(notification);
         }
     }
+
+    public async Task SendUserBannedNotificationAsync(int userId, string reason)
+    {
+        var notification = new CreateNotificationDto
+        {
+            UserId = userId,
+            Title = "⚠️ حساب شما مسدود شد",
+            Message = $"حساب کاربری شما توسط مدیر مسدود شد. دلیل: {reason}",
+            Type = "Security"
+        };
+
+        await CreateNotificationAsync(notification);
+    }
+
+    public async Task SendUserActivatedNotificationAsync(int userId, string message)
+    {
+        var notification = new CreateNotificationDto
+        {
+            UserId = userId,
+            Title = "✅ حساب شما فعال شد",
+            Message = message,
+            Type = "Security"
+        };
+
+        await CreateNotificationAsync(notification);
+    }
+
+    public async Task SendUserPromotedNotificationAsync(int userId, string title, string message)
+    {
+        var notification = new CreateNotificationDto
+        {
+            UserId = userId,
+            Title = title,
+            Message = message,
+            Type = "Account"
+        };
+
+        await CreateNotificationAsync(notification);
+    }
 }

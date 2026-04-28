@@ -9,4 +9,7 @@ public interface IEmailService
     Task SendWelcomeEmailAsync(string toEmail, string userName);
     Task SendPasswordResetEmailAsync(string toEmail, string userName, string resetLink);
     Task SendBulkEmailAsync(List<string> recipients, string subject, string body, bool isHtml = true);
+    Task SendUserBannedEmailAsync(string toEmail, string userName, string reason);
+    Task SendUserActivatedEmailAsync(string toEmail, string userName);
+    Task SendUserPromotedEmailAsync(string toEmail, string userName, string newRole);
 }

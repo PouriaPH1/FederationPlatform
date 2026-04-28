@@ -161,4 +161,58 @@ public class EmailService : IEmailService
         var tasks = recipients.Select(recipient => SendEmailAsync(recipient, subject, body, isHtml));
         await Task.WhenAll(tasks);
     }
+
+    public async Task SendUserBannedEmailAsync(string toEmail, string userName, string reason)
+    {
+        var subject = "⚠️ حساب شما مسدود شد";
+        var body = $@"
+            <div dir='rtl' style='font-family: Tahoma, Arial; padding: 20px;'>
+                <h2 style='color: #dc3545;'>سلام {userName} عزیز</h2>
+                <p>متاسفانه حساب کاربری شما توسط مدیر سیستم مسدود شد.</p>
+                <p><strong>دلیل مسدود کردن:</strong> {reason}</p>
+                <br>
+                <p>برای پرسش‌ها و درخواست بررسی مجدد با تیم پشتیبانی تماس بگیرید.</p>
+                <br>
+                <p>با تشکر،</p>
+                <p><strong>تیم فدراسیون اقتصاد سلامت</strong></p>
+            </div>
+        ";
+
+        await SendEmailAsync(toEmail, subject, body, true);
+    }
+
+    public async Task SendUserActivatedEmailAsync(string toEmail, string userName)
+    {
+        var subject = "✅ حساب شما فعال شد";
+        var body = $@"
+            <div dir='rtl' style='font-family: Tahoma, Arial; padding: 20px;'>
+                <h2 style='color: #28a745;'>سلام {userName} عزیز</h2>
+                <p>خوشحالیم که اطلاع دهیم حساب کاربری شما مجدداً فعال شد.</p>
+                <p>اکنون می‌توانید وارد سیستم شده و کارهای خود را ادامه دهید.</p>
+                <br>
+                <p>با تشکر،</p>
+                <p><strong>تیم فدراسیون اقتصاد سلامت</strong></p>
+            </div>
+        ";
+
+        await SendEmailAsync(toEmail, subject, body, true);
+    }
+
+    public async Task SendUserPromotedEmailAsync(string toEmail, string userName, string newRole)
+    {
+        var subject = "🎉 ترفیع شغلی شما";
+        var body = $@"
+            <div dir='rtl' style='font-family: Tahoma, Arial; padding: 20px;'>
+                <h2 style='color: #0EA5E9;'>سلام {userName} عزیز</h2>
+                <p>مبارک باشد! شما به نقش <strong>{newRole}</strong> ترفیع یافتید.</p>
+                <p>اکنون می‌توانید فعالیت‌های جدید ایجاد کرده و آن‌ها را برای تایید ثبت کنید.</p>
+                <p>لطفاً تعلیمات و ضوابط سیستم را با دقت مطالعه کنید.</p>
+                <br>
+                <p>با تشکر و تبریک،</p>
+                <p><strong>تیم فدراسیون اقتصاد سلامت</strong></p>
+            </div>
+        ";
+
+        await SendEmailAsync(toEmail, subject, body, true);
+    }
 }

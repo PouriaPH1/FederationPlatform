@@ -34,7 +34,7 @@
         </div>
 
         <!-- Users Table -->
-        @if (Model.AdminDashboard?.AllUsers.Any() ?? false)
+        @if ((Model?.AdminDashboard?.AllUsers?.Any()) ?? false)
         {
             <div class="table-responsive">
                 <table class="table admin-table">
@@ -43,8 +43,7 @@
                             <th>نام</th>
                             <th>ایمیل</th>
                             <th>دانشگاه</th>
-                            <th>نقش</th>
-                            <th>تاریخ ثبت</th>
+                            <th>نقش</th>                            <th>وضعیت</th>                            <th>تاریخ ثبت</th>
                             <th>عملیات</th>
                         </tr>
                     </thead>
@@ -59,13 +58,48 @@
                                 <td>@user.UniversityName</td>
                                 <td>
                                     <span class="role-badge @user.Role.ToLower()">@user.Role</span>
-                                </td>
-                                <td>@user.RegisterDate.ToString("yyyy/MM/dd")</td>
+                                </td>                                <td>
+                                    @if (user.IsActive)
+                                    {
+                                        <span class=\"active-status\"><i class=\"fas fa-check-circle\"></i> فعال</span>
+                                    }
+                                    else
+                                    {
+                                        <span class=\"inactive-status\"><i class=\"fas fa-times-circle\"></i> مسدود</span>
+                                    }
+                                </td>                                <td>@user.RegisterDate.ToString("yyyy/MM/dd")</td>
                                 <td>
                                     <div class="action-buttons">
                                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#userModal@user.Id">
                                             جزئیات
                                         </button>
+                                        @if (user.IsActive)
+                                        {
+                                            <form method="post" asp-action="BanUser" style="display:inline;">
+                                                <input type="hidden" name="userId" value="@user.Id">
+                                                <button type="submit" class="btn btn-sm btn-outline-warning" onclick="return confirm('آیا می‌خواهید این کاربر را مسدود کنید؟')">
+                                                    <i class="fas fa-ban"></i> مسدود
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form method="post" asp-action="ActivateUser" style="display:inline;">
+                                                <input type="hidden" name="userId" value="@user.Id">
+                                                <button type="submit" class="btn btn-sm btn-outline-success" onclick="return confirm('آیا می‌خواهید این کاربر را فعال کنید؟')">
+                                                    <i class="fas fa-check"></i> فعال
+                                                </button>
+                                            </form>
+                                        }
+                                        @if (user.Role != "Representative" && user.Role != "Admin")
+                                        {
+                                            <form method="post" asp-action="PromoteToRepresentative" style="display:inline;">
+                                                <input type="hidden" name="userId" value="@user.Id">
+                                                <button type="submit" class="btn btn-sm btn-outline-info" onclick="return confirm('آیا می‌خواهید این کاربر را به نماینده ترفیع دهید؟')">
+                                                    <i class="fas fa-arrow-up"></i> ترفیع
+                                                </button>
+                                            </form>
+                                        }
                                         <form method="post" asp-action="DeleteUser" style="display:inline;">
                                             <input type="hidden" name="userId" value="@user.Id">
                                             <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('آیا مطمئن هستید؟')">
@@ -183,5 +217,33 @@
 .table-responsive {
     border-radius: 12px;
     overflow: hidden;
+}
+
+.btn-sm {
+    margin: 0.2rem;
+}
+
+.action-buttons form {
+    display: inline-block;
+}
+
+.active-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #D1FAE5;
+    color: #065F46;
+}
+
+.inactive-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #FEE2E2;
+    color: #991B1B;
 }
 </style>

@@ -1,5 +1,6 @@
 using FederationPlatform.Application.DTOs;
 using FederationPlatform.Application.Services;
+using FederationPlatform.Domain.Enums;
 using FederationPlatform.Web.Models;
 using FederationPlatform.Web.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -288,6 +289,18 @@ public class AdminController : Controller
             if (!result)
                 return BadRequest("خطا در حذف");
 
+            // Log the action
+            await _activityLogService.LogAsync(new Application.DTOs.CreateActivityLogDto
+            {
+                UserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                Action = "Delete",
+                EntityType = "User",
+                EntityId = id,
+                Details = $"حذف کاربر: {id}",
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
+                UserAgent = HttpContext.Request.Headers["User-Agent"].ToString()
+            });
+
             _logger.LogInformation("User {UserId} deleted", id);
             return RedirectToAction("Users", new { message = "کاربر حذف شد" });
         }
@@ -295,6 +308,167 @@ public class AdminController : Controller
         {
             _logger.LogError(ex, "Error deleting user");
             return BadRequest("خطایی در حین حذف رخ داد");
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> BanUser(string userId)
+    {
+        try
+        {
+            if (!int.TryParse(userId, out int id))
+                return BadRequest("شناسه کاربر معتبر نیست");
+
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound("کاربر یافت نشد");
+
+            var result = await _userService.BanUserAsync(id);
+            
+            if (!result)
+                return BadRequest("خطا در مسدود کردن کاربر");
+
+            // Send notification to user
+            await _notificationService.SendUserBannedNotificationAsync(id, "حساب شما توسط مدیر سیستم مسدود شد");
+
+            // Send email to user
+            if (!string.IsNullOrEmpty(user.Email))
+            {
+                await _emailService.SendUserBannedEmailAsync(
+                    user.Email, 
+                    user.Username, 
+                    "حساب شما مسدود شد");
+            }
+
+            // Log the action
+            await _activityLogService.LogAsync(new Application.DTOs.CreateActivityLogDto
+            {
+                UserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                Action = "Ban",
+                EntityType = "User",
+                EntityId = id,
+                Details = $"مسدود کردن کاربر: {user.Username} ({user.Email})",
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
+                UserAgent = HttpContext.Request.Headers["User-Agent"].ToString()
+            });
+
+            _logger.LogInformation("User {UserId} banned by admin", id);
+            return RedirectToAction("Users", new { message = "کاربر مسدود شد" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error banning user");
+            return BadRequest("خطایی در حین مسدود کردن رخ داد");
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ActivateUser(string userId)
+    {
+        try
+        {
+            if (!int.TryParse(userId, out int id))
+                return BadRequest("شناسه کاربر معتبر نیست");
+
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound("کاربر یافت نشد");
+
+            var result = await _userService.ActivateUserAsync(id);
+            
+            if (!result)
+                return BadRequest("خطا در فعال کردن کاربر");
+
+            // Send notification to user
+            await _notificationService.SendUserActivatedNotificationAsync(id, "حساب شما فعال شد");
+
+            // Send email to user
+            if (!string.IsNullOrEmpty(user.Email))
+            {
+                await _emailService.SendUserActivatedEmailAsync(
+                    user.Email, 
+                    user.Username);
+            }
+
+            // Log the action
+            await _activityLogService.LogAsync(new Application.DTOs.CreateActivityLogDto
+            {
+                UserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                Action = "Activate",
+                EntityType = "User",
+                EntityId = id,
+                Details = $"فعال کردن کاربر: {user.Username} ({user.Email})",
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
+                UserAgent = HttpContext.Request.Headers["User-Agent"].ToString()
+            });
+
+            _logger.LogInformation("User {UserId} activated by admin", id);
+            return RedirectToAction("Users", new { message = "کاربر فعال شد" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error activating user");
+            return BadRequest("خطایی در حین فعال کردن رخ داد");
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> PromoteToRepresentative(string userId)
+    {
+        try
+        {
+            if (!int.TryParse(userId, out int id))
+                return BadRequest("شناسه کاربر معتبر نیست");
+
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound("کاربر یافت نشد");
+
+            if (user.Role == UserRole.Representative || user.Role == UserRole.Admin)
+                return BadRequest("این کاربر قبلاً نماینده یا مدیر است");
+
+            var result = await _userService.PromoteToRepresentativeAsync(id);
+            
+            if (!result)
+                return BadRequest("خطا در ترفیع کاربر");
+
+            // Send notification to user
+            await _notificationService.SendUserPromotedNotificationAsync(
+                id, 
+                "شما به نماینده ارتقا یافتید",
+                "شما اکنون می‌توانید فعالیت‌ها را ایجاد و ارسال کنید");
+
+            // Send email to user
+            if (!string.IsNullOrEmpty(user.Email))
+            {
+                await _emailService.SendUserPromotedEmailAsync(
+                    user.Email, 
+                    user.Username, 
+                    "ترفیع به نماینده");
+            }
+
+            // Log the action
+            await _activityLogService.LogAsync(new Application.DTOs.CreateActivityLogDto
+            {
+                UserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0"),
+                Action = "Promote",
+                EntityType = "User",
+                EntityId = id,
+                Details = $"ترفیع کاربر {user.Username} ({user.Email}) به نماینده",
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "",
+                UserAgent = HttpContext.Request.Headers["User-Agent"].ToString()
+            });
+
+            _logger.LogInformation("User {UserId} promoted to Representative by admin", id);
+            return RedirectToAction("Users", new { message = "کاربر به نماینده ترفیع یافت" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error promoting user");
+            return BadRequest("خطایی در حین ترفیع رخ داد");
         }
     }
 }
