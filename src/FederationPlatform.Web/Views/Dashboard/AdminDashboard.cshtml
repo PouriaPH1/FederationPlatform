@@ -49,6 +49,24 @@
                 <p>دانشگاه‌های عضو</p>
             </div>
         </div>
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div class="metric-icon active-users">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h4>@(Model.AdminDashboard?.AllUsers?.Count(u => u.IsActive) ?? 0)</h4>
+                <p>کاربران فعال</p>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="metric-card">
+                <div class="metric-icon banned-users">
+                    <i class="fas fa-user-slash"></i>
+                </div>
+                <h4>@(Model.AdminDashboard?.AllUsers?.Count(u => !u.IsActive) ?? 0)</h4>
+                <p>کاربران مسدود</p>
+            </div>
+        </div>
     </div>
 
     <!-- Admin Actions -->
@@ -251,6 +269,14 @@
 
 .metric-icon.universities {
     background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+}
+
+.metric-icon.active-users {
+    background: linear-gradient(135deg, #06B6D4 0%, #22D3EE 100%);
+}
+
+.metric-icon.banned-users {
+    background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
 }
 
 .metric-card h4 {
