@@ -58,16 +58,18 @@
                                 <td>@user.UniversityName</td>
                                 <td>
                                     <span class="role-badge @user.Role.ToLower()">@user.Role</span>
-                                </td>                                <td>
+                                </td>
+                                <td>
                                     @if (user.IsActive)
                                     {
-                                        <span class=\"active-status\"><i class=\"fas fa-check-circle\"></i> فعال</span>
+                                        <span class="active-status"><i class="fas fa-check-circle"></i> فعال</span>
                                     }
                                     else
                                     {
-                                        <span class=\"inactive-status\"><i class=\"fas fa-times-circle\"></i> مسدود</span>
+                                        <span class="inactive-status"><i class="fas fa-times-circle"></i> مسدود</span>
                                     }
-                                </td>                                <td>@user.RegisterDate.ToString("yyyy/MM/dd")</td>
+                                </td>
+                                <td>@user.RegisterDate.ToString("yyyy/MM/dd")</td>
                                 <td>
                                     <div class="action-buttons">
                                         <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#userModal@user.Id">

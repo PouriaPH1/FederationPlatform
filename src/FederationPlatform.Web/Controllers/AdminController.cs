@@ -61,11 +61,15 @@ public class AdminController : Controller
                     AllUsers = allUsers?.Select(u => new UserAdminViewModel
                     {
                         Id = u.Id,
+                        Username = u.UserName,
                         FirstName = u.FirstName,
                         LastName = u.LastName,
                         Email = u.Email,
+                        Role = u.Role.ToString(),
+                        IsActive = u.IsActive,
                         UniversityName = "دانشگاه",
-                        RegisterDate = u.CreatedAt
+                        RegisterDate = u.CreatedAt,
+                        CreatedAt = u.CreatedAt
                     }).ToList() ?? new List<UserAdminViewModel>()
                 }
             };
