@@ -79,7 +79,8 @@ public class DashboardController : Controller
                         Location = a.Location,
                         UniversityName = a.UniversityName,
                         Description = a.Description
-                    }).ToList() ?? new List<ActivityBriefViewModel>()
+                    }).ToList() ?? new List<ActivityBriefViewModel>(),
+                    JoinedActivities = new List<ActivityDetailViewModel>()
                 }
             };
 
@@ -121,7 +122,8 @@ public class DashboardController : Controller
                         Location = a.Location,
                         UniversityName = a.UniversityName,
                         Description = a.Description
-                    }).ToList() ?? new List<ActivityBriefViewModel>()
+                    }).ToList() ?? new List<ActivityBriefViewModel>(),
+                    JoinedActivities = new List<ActivityDetailViewModel>()
                 }
             };
 
@@ -157,7 +159,7 @@ public class DashboardController : Controller
                     {
                         Id = a.Id,
                         Title = a.Title,
-                        Description = a.Description,
+                        Description = a.Description ?? "",
                         UniversityName = a.University ?? "",
                         RepresentativeName = a.Representative ?? "",
                         SubmitDate = a.CreatedAt,

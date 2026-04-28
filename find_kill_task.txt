@@ -1,0 +1,25 @@
+find process with port 
+
+netstat -ano | findstr LISTENING | findstr ":port"
+
+ex:
+netstat -ano | findstr LISTENING | findstr ":5011"
+
+
+
+see info of task with pid:
+
+tasklist /FI "PID eq your pid" /FO LIST
+
+
+ex:
+tasklist /FI "PID eq 19460" /FO LIST
+
+
+kill task with pid :
+
+taskkill /PID pid /F
+
+
+ex:
+taskkill /PID 19460 /F

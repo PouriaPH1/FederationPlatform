@@ -127,19 +127,19 @@
     }
 
     <!-- Statistics Section -->
-    @if (Model.AdminDashboard?.Statistics.Any() ?? false)
+    @if (Model.AdminDashboard?.Statistics?.Any() ?? false)
     {
         <div class="row mb-4">
             <div class="col-lg-12">
                 <h3 class="section-title">آمار فعالیت‌ها</h3>
                 <div class="statistics-grid">
-                    @foreach (var stat in Model.AdminDashboard.Statistics.Take(6))
+                    @foreach (var stat in (Model.AdminDashboard?.Statistics ?? Enumerable.Empty<ActivityStatViewModel>()).Take(6))
                     {
                         <div class="stat-box-admin">
                             <h6>@stat.Category</h6>
                             <h4>@stat.Count</h4>
                             <div class="stat-chart">
-                                <div class="chart-bar" style="width: @((stat.Count * 100 / (Model.AdminDashboard.Statistics.Max(s => s.Count) == 0 ? 1 : Model.AdminDashboard.Statistics.Max(s => s.Count))))%"></div>
+                                <div class="chart-bar" style="width: @((stat.Count * 100 / ((Model.AdminDashboard?.Statistics?.Max(s => s.Count) ?? 0) == 0 ? 1 : (Model.AdminDashboard?.Statistics?.Max(s => s.Count) ?? 1))))%"></div>
                             </div>
                         </div>
                     }
@@ -149,7 +149,7 @@
     }
 
     <!-- Recent Users -->
-    @if (Model.AdminDashboard?.RecentUsers.Any() ?? false)
+    @if (Model.AdminDashboard?.RecentUsers?.Any() ?? false)
     {
         <div class="row mb-4">
             <div class="col-lg-12">
@@ -166,7 +166,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var user in Model.AdminDashboard.RecentUsers.Take(5))
+                            @foreach (var user in (Model.AdminDashboard?.RecentUsers ?? Enumerable.Empty<UserAdminViewModel>()).Take(5))
                             {
                                 <tr>
                                     <td>@user.FullName</td>

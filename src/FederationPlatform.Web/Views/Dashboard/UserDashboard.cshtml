@@ -111,13 +111,13 @@
     }
 
     <!-- Joined Activities -->
-    @if (Model.UserDashboard?.JoinedActivities.Any() ?? false)
+    @if (Model.UserDashboard?.JoinedActivities?.Any() ?? false)
     {
         <div class="row mb-4">
             <div class="col-lg-12">
                 <h3 class="section-title">فعالیت‌های شرکت شده</h3>
                 <div class="activities-list">
-                    @foreach (var activity in Model.UserDashboard.JoinedActivities.Take(5))
+                    @foreach (var activity in (Model.UserDashboard.JoinedActivities ?? Enumerable.Empty<ActivityDetailViewModel>()).Take(5))
                     {
                         <div class="activity-item">
                             <div class="activity-status-badge @activity.Status.ToString().ToLower()">

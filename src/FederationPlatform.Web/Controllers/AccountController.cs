@@ -14,11 +14,13 @@ namespace FederationPlatform.Web.Controllers;
 public class AccountController : Controller
 {
     private readonly IIdentityService _identityService;
+    private readonly IUniversityService _universityService;
     private readonly ILogger<AccountController> _logger;
 
-    public AccountController(IIdentityService identityService, ILogger<AccountController> logger)
+    public AccountController(IIdentityService identityService, IUniversityService universityService, ILogger<AccountController> logger)
     {
         _identityService = identityService;
+        _universityService = universityService;
         _logger = logger;
     }
 
@@ -54,7 +56,8 @@ public class AccountController : Controller
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email ?? "")
+                new Claim(ClaimTypes.Email, user.Email ?? ""),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -132,6 +135,8 @@ public class AccountController : Controller
             if (userProfile == null)
                 return NotFound();
 
+            var universities = await _universityService.GetAllUniversitiesAsync();
+
             var model = new ProfileViewModel
             {
                 Username = userProfile.Username,
@@ -140,7 +145,11 @@ public class AccountController : Controller
                 LastName = userProfile.UserProfile?.LastName ?? "",
                 Phone = userProfile.UserProfile?.PhoneNumber ?? "",
                 Role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User",
-                UniversityId = userProfile.UserProfile?.UniversityId ?? 0
+                UniversityId = userProfile.UserProfile?.UniversityId ?? 0,
+                Universities = universities?
+                    .Where(u => u.IsActive)
+                    .ToDictionary(u => u.Id, u => u.Name ?? "")
+                    ?? new Dictionary<int, string>()
             };
 
             return View(model);
@@ -157,7 +166,14 @@ public class AccountController : Controller
     public async Task<IActionResult> UpdateProfile(ProfileViewModel model)
     {
         if (!ModelState.IsValid)
+        {
+            var universities = await _universityService.GetAllUniversitiesAsync();
+            model.Universities = universities?
+                .Where(u => u.IsActive)
+                .ToDictionary(u => u.Id, u => u.Name ?? "")
+                ?? new Dictionary<int, string>();
             return View("Profile", model);
+        }
 
         try
         {
